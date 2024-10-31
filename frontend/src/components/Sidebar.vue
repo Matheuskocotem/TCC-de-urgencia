@@ -1,6 +1,7 @@
+<!-- src/components/Sidebar.vue -->
 <script setup>
 import { ref } from 'vue'
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterLink } from 'vue-router'
 import { UserCircle, LogOut, Calendar, Home, Users } from 'lucide-vue-next'
 
 const showProfileMenu = ref(false)
@@ -16,52 +17,41 @@ const logout = () => {
 </script>
 
 <template>
-  <div class="app-container">
-    <aside class="sidebar">
-      <div class="logo">
-        <img alt="Logo" src="@/assets/logo.svg" width="40" height="40" />
-      </div>
-      <nav>
-        <RouterLink to="/" class="nav-item">
-          <Home class="icon" />
-          <span>Início</span>
-        </RouterLink>
-        <RouterLink to="/salas" class="nav-item">
-          <Users class="icon" />
-          <span>Salas</span>
-        </RouterLink>
-        <RouterLink to="/reunioes" class="nav-item">
-          <Calendar class="icon" />
-          <span>Reuniões</span>
-        </RouterLink>
-      </nav>
-      <div class="profile">
-        <button @click="toggleProfileMenu" class="profile-button">
-          <UserCircle class="icon" />
-          <span>Perfil</span>
+  <aside class="sidebar">
+    <div class="logo">
+      <img alt="Logo" src="@/assets/logo.svg" width="40" height="40" />
+    </div>
+    <nav>
+      <RouterLink to="/" class="nav-item">
+        <Home class="icon" />
+        <span>Início</span>
+      </RouterLink>
+      <RouterLink to="/salas" class="nav-item">
+        <Users class="icon" />
+        <span>Salas</span>
+      </RouterLink>
+      <RouterLink to="/reunioes" class="nav-item">
+        <Calendar class="icon" />
+        <span>Reuniões</span>
+      </RouterLink>
+    </nav>
+    <div class="profile">
+      <button @click="toggleProfileMenu" class="profile-button">
+        <UserCircle class="icon" />
+        <span>Perfil</span>
+      </button>
+      <div v-if="showProfileMenu" class="profile-menu">
+        <RouterLink to="/perfil" class="menu-item">Editar Perfil</RouterLink>
+        <button @click="logout" class="menu-item logout">
+          <LogOut class="icon" />
+          <span>Sair</span>
         </button>
-        <div v-if="showProfileMenu" class="profile-menu">
-          <RouterLink to="/perfil" class="menu-item">Editar Perfil</RouterLink>
-          <button @click="logout" class="menu-item logout">
-            <LogOut class="icon" />
-            <span>Sair</span>
-          </button>
-        </div>
       </div>
-    </aside>
-
-    <main>
-      <RouterView />
-    </main>
-  </div>
+    </div>
+  </aside>
 </template>
 
 <style scoped>
-.app-container {
-  display: flex;
-  height: 100vh;
-}
-
 .sidebar {
   width: 250px;
   background-color: #f3f4f6;
@@ -73,10 +63,6 @@ const logout = () => {
 .logo {
   margin-bottom: 2rem;
   text-align: center;
-}
-
-nav {
-  flex-grow: 1;
 }
 
 .nav-item {
@@ -98,6 +84,7 @@ nav {
 }
 
 .profile {
+  margin-top: auto;
   position: relative;
 }
 
@@ -142,11 +129,5 @@ nav {
   background: none;
   border: none;
   cursor: pointer;
-}
-
-main {
-  flex-grow: 1;
-  padding: 2rem;
-  overflow-y: auto;
 }
 </style>
