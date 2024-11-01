@@ -7,9 +7,7 @@
         <button @click="previousMonth" class="control-button">
           <ChevronLeftIcon class="icon" />
         </button>
-        <button @click="goToToday" class="today-button">
-          hoje
-        </button>
+        <button @click="goToToday" class="today-button">hoje</button>
         <button @click="nextMonth" class="control-button">
           <ChevronRightIcon class="icon" />
         </button>
@@ -18,20 +16,17 @@
 
     <!-- Calendar Grid -->
     <div class="calendar-grid">
-      <!-- Week days header -->
-      <div v-for="day in weekDays" :key="day" class="day-header">
-        {{ day }}
-      </div>
+      <div v-for="day in weekDays" :key="day" class="day-header">{{ day }}</div>
 
-      <!-- Calendar days -->
       <div 
         v-for="(day, index) in calendarDays" 
         :key="index"
-        :class="[
-          'calendar-day',
-          isToday(day) ? 'today' : '',
-          !isCurrentMonth(day) ? 'inactive' : ''
+        :class="[ 
+          'calendar-day', 
+          isToday(day) ? 'today' : '', 
+          !isCurrentMonth(day) ? 'inactive' : '' 
         ]"
+        @click="openModal(day)" 
       >
         <div class="day-content">
           <span :class="['day-number', isToday(day) ? 'highlight' : '']">
@@ -43,14 +38,28 @@
         </div>
       </div>
     </div>
+
+    <ReservationModal
+      :show="showModal"
+      :date="selectedDate"
+      :availableTimes="availableTimes"
+      :rooms="rooms"
+      @close="closeModal"
+      @save="handleSave"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-vue-next'
+import ReservationModal from '../components/ReservationModal.vue'
 
 const currentDate = ref(new Date())
+const showModal = ref(false)
+const selectedDate = ref(null)
+const availableTimes = ref(['08:00', '09:00', '10:00', '11:00', '14:00', '15:00', '16:00']) // Exemplos de horários disponíveis
+const rooms = ref([{ id: 1, name: 'Sala A' }, { id: 2, name: 'Sala B' }]) // Exemplos de salas
 
 const weekDays = ['dom.', 'seg.', 'ter.', 'qua.', 'qui.', 'sex.', 'sáb.']
 
@@ -65,19 +74,11 @@ const calendarDays = computed(() => {
   
   // Get the first day of the month
   const firstDay = new Date(year, month, 1)
-  // Get the last day of the month
   const lastDay = new Date(year, month + 1, 0)
-  
-  // Get the day of the week for the first day (0-6)
   const firstDayOfWeek = firstDay.getDay()
-  
-  // Calculate how many days we need from the previous month
   const daysFromPrevMonth = firstDayOfWeek
-  
-  // Calculate total days needed (35 or 42 depending on the month)
   const totalDays = Math.ceil((daysFromPrevMonth + lastDay.getDate()) / 7) * 7
   
-  // Generate array of dates
   const days = []
   
   // Add days from previous month
@@ -110,6 +111,21 @@ const isCurrentMonth = (date) => {
   return date.getMonth() === currentDate.value.getMonth()
 }
 
+const openModal = (day) => {
+  selectedDate.value = day.toISOString().split('T')[0] // Armazena a data selecionada
+  showModal.value = true
+}
+
+const closeModal = () => {
+  showModal.value = false
+}
+
+const handleSave = (data) => {
+  // Aqui você pode adicionar a lógica para salvar a reunião
+  console.log('Dados da reunião:', data)
+  closeModal()
+}
+
 const previousMonth = () => {
   currentDate.value = new Date(
     currentDate.value.getFullYear(),
@@ -131,21 +147,21 @@ const goToToday = () => {
 }
 </script>
 
+
 <style scoped>
 .calendar {
   background-color: white;
   border-radius: 0.5rem;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  height: 100%; /* Ou defina uma altura específica, como 80vh ou 600px */
+  height: 100%;
   width: 100%;
 }
 
-
 .calendar-header {
   padding: 1rem;
-  background-color: #f9fafb; /* gray-50 */
-  border-bottom: 1px solid #e5e7eb; /* gray-300 */
+  background-color: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -154,7 +170,7 @@ const goToToday = () => {
 .calendar-title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #4b5563; /* gray-800 */
+  color: #4b5563;
 }
 
 .calendar-controls {
@@ -170,20 +186,20 @@ const goToToday = () => {
 }
 
 .control-button:hover {
-  background-color: #e5e7eb; /* gray-200 */
+  background-color: #e5e7eb;
 }
 
 .today-button {
   padding: 0.5rem 0.75rem;
   font-size: 0.875rem;
-  background-color: #4a5568; /* gray-700 */
+  background-color: #4a5568;
   color: white;
   border-radius: 0.375rem;
   transition: background-color 0.2s;
 }
 
 .today-button:hover {
-  background-color: #4c51bf; /* blue-700 */
+  background-color: #4c51bf;
 }
 
 .calendar-grid {
@@ -197,27 +213,27 @@ const goToToday = () => {
   text-align: center;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #6b7280; /* gray-500 */
-  border-bottom: 1px solid #e5e7eb; /* gray-300 */
+  color: #6b7280;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .calendar-day {
-  height: 8.5rem; /* Aumentar a altura dos dias */
-  border: 1px solid #e5e7eb; /* gray-100 */
-  padding: 0.5rem; /* Aumentar o padding para mais espaço interno */
+  height: 8.5rem;
+  border: 1px solid #e5e7eb;
+  padding: 0.5rem;
   transition: background-color 0.2s;
 }
 
 .calendar-day:hover {
-  background-color: #f9fafb; /* gray-50 */
+  background-color: #f9fafb;
 }
 
 .today {
-  background-color: #feebc8; /* yellow-50 */
+  background-color: #feebc8;
 }
 
 .inactive {
-  color: #9ca3af; /* gray-400 */
+  color: #9ca3af;
 }
 
 .day-content {
@@ -238,7 +254,7 @@ const goToToday = () => {
 }
 
 .highlight {
-  background-color: #4c51bf; /* blue-600 */
+  background-color: #4c51bf;
   color: white;
 }
 
@@ -247,14 +263,42 @@ const goToToday = () => {
   overflow-y: auto;
 }
 
+/* Modal styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  width: 300px;
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  cursor: pointer;
+}
+
 /* Hide scrollbar for Chrome, Safari and Opera */
 ::-webkit-scrollbar {
   display: none;
 }
 
-/* Hide scrollbar for IE, Edge and Firefox */
+/* Hide scrollbar for IE and Edge */
 * {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
 }
 </style>
