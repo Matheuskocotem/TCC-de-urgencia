@@ -1,20 +1,3 @@
-<!-- src/components/Sidebar.vue -->
-<script setup>
-import { ref } from 'vue'
-import { RouterLink } from 'vue-router'
-import { UserCircle, LogOut, Calendar, Home, Users } from 'lucide-vue-next'
-
-const showProfileMenu = ref(false)
-
-const toggleProfileMenu = () => {
-  showProfileMenu.value = !showProfileMenu.value
-}
-
-const logout = () => {
-  console.log('Logout')
-}
-</script>
-
 <template>
   <aside class="sidebar">
     <div class="logo">
@@ -50,6 +33,23 @@ const logout = () => {
   </aside>
 </template>
 
+<script setup>
+import { ref } from 'vue'
+import { RouterLink } from 'vue-router'
+import { UserCircle, LogOut, Calendar, Home, Users } from 'lucide-vue-next'
+
+const showProfileMenu = ref(false)
+
+const toggleProfileMenu = () => {
+  showProfileMenu.value = !showProfileMenu.value
+}
+
+const logout = () => {
+  // Implementar lógica de logout
+  console.log('Logout')
+}
+</script>
+
 <style scoped>
 .sidebar {
   width: 250px;
@@ -64,6 +64,10 @@ const logout = () => {
   text-align: center;
 }
 
+nav {
+  flex-grow: 1;
+}
+
 .nav-item {
   display: flex;
   align-items: center;
@@ -74,7 +78,8 @@ const logout = () => {
   margin-bottom: 0.5rem;
 }
 
-.nav-item:hover, .nav-item.router-link-active {
+.nav-item:hover,
+.nav-item.router-link-active {
   background-color: #e5e7eb;
 }
 
@@ -83,7 +88,6 @@ const logout = () => {
 }
 
 .profile {
-  margin-top: auto;
   position: relative;
 }
 
