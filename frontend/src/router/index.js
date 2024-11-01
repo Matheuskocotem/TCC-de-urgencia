@@ -35,6 +35,14 @@ const router = createRouter({
         title: 'VizualiazarReunioes'
       }
     },
+    {
+      path: '/admin',
+      name: 'admin',
+      component: () => import('../views/AdminDashboard.vue'),
+      meta: {
+        title: 'admin'
+      }
+    }
   ]
 })
 
