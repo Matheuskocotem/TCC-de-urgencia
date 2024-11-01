@@ -1,40 +1,138 @@
 <template>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div v-for="room in rooms" :key="room.id" class="bg-white rounded-lg shadow overflow-hidden">
-        <div class="p-4">
-          <h3 class="text-lg font-semibold text-gray-800">{{ room.name }}</h3>
-          <p class="text-sm text-gray-600">Capacidade: {{ room.capacity }} pessoas</p>
-          <div class="mt-2">
-            <span v-for="resource in room.resources" :key="resource" class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-              {{ resource }}
+  <div class="room-list">
+    <div v-for="room in rooms" :key="room.id" class="room-card">
+      <div class="room-content">
+        <h3 class="room-name">{{ room.name }}</h3>
+        <p class="room-capacity">Capacidade: {{ room.capacity }} pessoas</p>
+        <div class="room-resources">
+          <span
+            v-for="resource in room.resources"
+            :key="resource"
+            class="resource"
+          >
+            {{ resource }}
+          </span>
+        </div>
+        <div class="room-slots">
+          <h4 class="slots-title">Horários Disponíveis:</h4>
+          <div class="slot-list">
+            <span
+              v-for="slot in room.availableSlots"
+              :key="slot"
+              class="slot"
+            >
+              {{ slot }}
             </span>
           </div>
-          <div class="mt-4">
-            <h4 class="text-sm font-medium text-gray-700 mb-1">Horários Disponíveis:</h4>
-            <div class="flex flex-wrap gap-2">
-              <span v-for="slot in room.availableSlots" :key="slot" class="inline-block bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">
-                {{ slot }}
-              </span>
-            </div>
-          </div>
-        </div>
-        <div class="bg-gray-50 px-4 py-3 sm:px-6">
-          <button 
-            @click="$emit('open-reservation', room)"
-            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
-          >
-            Reservar
-          </button>
         </div>
       </div>
+      <div class="room-footer">
+        <button @click="$emit('open-reservation', room)" class="reserve-button">
+          Reservar
+        </button>
+      </div>
     </div>
-  </template>
-  
-  <script setup>
-  defineProps({
-    rooms: Array
-  })
-  
-  defineEmits(['open-reservation'])
-  </script>
-  
+  </div>
+</template>
+
+<script setup>
+defineProps({
+  rooms: Array
+})
+
+defineEmits(['open-reservation'])
+</script>
+
+<style scoped>
+.room-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.room-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.room-content {
+  padding: 16px;
+}
+
+.room-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.room-capacity {
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.room-resources {
+  margin-top: 8px;
+}
+
+.resource {
+  display: inline-block;
+  background-color: #e2e8f0;
+  border-radius: 12px;
+  padding: 4px 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #4a5568;
+  margin-right: 8px;
+  margin-bottom: 8px;
+}
+
+.room-slots {
+  margin-top: 16px;
+}
+
+.slots-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4a5568;
+  margin-bottom: 4px;
+}
+
+.slot-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.slot {
+  background-color: #c6f6d5; /* Verde claro */
+  color: #276749; /* Verde escuro */
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.room-footer {
+  background-color: #f7fafc; /* Cinza claro */
+  padding: 16px;
+}
+
+.reserve-button {
+  width: 100%;
+  padding: 10px;
+  background-color: #4c51bf; /* Azul */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.reserve-button:hover {
+  background-color: #434190; /* Azul mais escuro */
+}
+</style>
