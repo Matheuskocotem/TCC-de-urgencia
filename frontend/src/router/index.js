@@ -21,18 +21,18 @@ const router = createRouter({
     },
     {
       path: '/',
-      name: 'home',
-      component: () => import('../views/Home.vue'),
+      name: 'VizualiazarReunioes',
+      component: () => import('../views/VizualiazarReunioes.vue'),
       meta: {
-        title: 'home'
+        title: 'VizualiazarReunioes'
       }
     },
     {
       path: '/reunioes',
-      name: 'reunioes',
+      name: 'Reunioes',
       component: () => import('../views/reunioes.vue'),
       meta: {
-        title: 'salreunioesas'
+        title: 'Reunioes'
       }
     },
   ]
