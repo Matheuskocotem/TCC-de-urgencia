@@ -11,7 +11,6 @@ const toggleProfileMenu = () => {
 }
 
 const logout = () => {
-  // Implementar lógica de logout
   console.log('Logout')
 }
 </script>
