@@ -4,7 +4,8 @@ import { ref } from 'vue'
 const props = defineProps({
   show: Boolean,
   date: String,
-  availableTimes: Array
+  availableTimes: Array,
+  rooms: Array // Propriedade para salas disponíveis
 })
 
 const emit = defineEmits(['close', 'save'])
@@ -12,13 +13,15 @@ const emit = defineEmits(['close', 'save'])
 const meetingName = ref('')
 const startTime = ref('')
 const endTime = ref('')
+const selectedRoom = ref('') // Variável para armazenar a sala selecionada
 
 const save = () => {
   emit('save', {
     name: meetingName.value,
     date: props.date,
     startTime: startTime.value,
-    endTime: endTime.value
+    endTime: endTime.value,
+    room: selectedRoom.value // Incluindo a sala selecionada nos dados a serem emitidos
   })
   resetForm()
 }
@@ -27,6 +30,7 @@ const resetForm = () => {
   meetingName.value = ''
   startTime.value = ''
   endTime.value = ''
+  selectedRoom.value = '' // Resetando a sala selecionada
 }
 </script>
 
@@ -38,6 +42,13 @@ const resetForm = () => {
         <div class="form-group">
           <label for="meetingName">Nome da Reunião:</label>
           <input id="meetingName" v-model="meetingName" required>
+        </div>
+        <div class="form-group">
+          <label for="room">Sala:</label>
+          <select id="room" v-model="selectedRoom" required>
+            <option value="" disabled selected>Selecione uma sala</option>
+            <option v-for="room in props.rooms" :key="room.id" :value="room.id">{{ room.name }}</option>
+          </select>
         </div>
         <div class="form-group">
           <label for="startTime">Horário de Início:</label>
