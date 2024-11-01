@@ -22,17 +22,17 @@ const router = createRouter({
     {
       path: '/',
       name: 'VizualiazarReunioes',
-      component: () => import('../views/VizualiazarReunioes.vue'),
+      component: () => import('../views/reunioes.vue'),
       meta: {
-        title: 'VizualiazarReunioes'
+        title: 'caleendario'
       }
     },
     {
       path: '/reunioes',
       name: 'Reunioes',
-      component: () => import('../views/reunioes.vue'),
+      component: () => import('../views/VizualiazarReunioes.vue'),
       meta: {
-        title: 'Reunioes'
+        title: 'VizualiazarReunioes'
       }
     },
   ]
