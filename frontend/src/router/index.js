@@ -12,6 +12,14 @@ const router = createRouter({
       }
     },
     {
+      path: '/register',
+      name: 'register',
+      component: () => import('../views/Register.vue'),
+      meta: {
+        title: 'register'
+      }
+    },
+    {
       path: '/salas',
       name: 'salas',
       component: () => import('../views/EscolherSala.vue'),
@@ -42,7 +50,7 @@ const router = createRouter({
       meta: {
         title: 'admin'
       }
-    }
+    },
   ]
 })
 
