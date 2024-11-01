@@ -26,7 +26,7 @@
   <script setup>
   import { ref, computed } from 'vue'
   import RoomList from '../components/RoomList.vue'
-  import ReservationModal from '../components/ReservationModal.vue'
+  import ReservationModal from '../components/ReservationModalSalas.vue'
   
   // Dados mockados
   const rooms = ref([
