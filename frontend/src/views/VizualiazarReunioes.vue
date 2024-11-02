@@ -26,8 +26,7 @@
 </template>
 
 <script>
-import SideBar from '../components/Sidebar.vue'; // Certifique-se de que o caminho esteja correto
-
+import SideBar from '../components/Sidebar.vue'; 
 export default {
   components: {
     SideBar,

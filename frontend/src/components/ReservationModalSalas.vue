@@ -79,20 +79,22 @@ const submitReservation = () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7); /* Escurecendo um pouco mais */
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000; /* Um valor alto para garantir que fique na frente */
 }
 
 .modal-content {
   background: white;
   border-radius: 0.5rem;
-  padding: 2rem; /* Aumentando o padding para um layout mais espaçado */
+  padding: 2rem;
   width: 90%;
   max-width: 400px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Sombras mais suaves */
-  transition: transform 0.3s ease; /* Transição suave */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+  z-index: 1001; /* Um valor alto para garantir que o conteúdo do modal fique na frente */
 }
 
 .modal-header {

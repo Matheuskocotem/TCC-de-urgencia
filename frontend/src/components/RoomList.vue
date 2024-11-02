@@ -55,10 +55,14 @@ defineEmits(['open-reservation'])
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  display: flex;
+  flex-direction: column; /* Organiza conteúdo verticalmente */
+  height: 100%; /* Mesma altura para todos os cartões */
 }
 
 .room-content {
   padding: 16px;
+  flex-grow: 1; /* Permite que o conteúdo ocupe o espaço disponível */
 }
 
 .room-name {
@@ -100,9 +104,9 @@ defineEmits(['open-reservation'])
 }
 
 .slot-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  display: flex; /* Exibe slots em linha */
+  flex-wrap: wrap; /* Permite que os slots se movam para a próxima linha se não houver espaço */
+  gap: 8px; /* Espaçamento entre os slots */
 }
 
 .slot {
