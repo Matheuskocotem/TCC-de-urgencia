@@ -32,16 +32,15 @@
             aria-label="E-mail"
           />
   
-          <!-- Campo de CPF -->
           <input
-            type="text"
-            placeholder="Digite seu CPF"
-            v-model="form.cpf"
-            required
-            pattern="\d{3}\.\d{3}\.\d{3}-\d{2}"
-            title="Digite um CPF válido no formato 000.000.000-00"
-            aria-label="CPF"
-          />
+          type="text"
+          placeholder="Digite seu CPF"
+          v-model="form.cpf"
+          @input="formatCpf"
+          maxlength="14" 
+          required
+          aria-label="CPF"
+        />
   
           <!-- Campo de Senha -->
           <input
@@ -67,7 +66,7 @@
   
         <!-- Link de login -->
         <div id="linkForm">
-          <a href="login" class="link">Já tenho uma conta. Fazer login</a>
+          <a href="login" class="link">Já tem uma conta? Faça login.</a>
         </div>
       </div>
   
@@ -94,23 +93,39 @@
       };
     },
     methods: {
-  async handleRegister() {
-    try {
-      const response = await axios.post('http://localhost:8000/api/register', this.form);
-        console.log('Registro realizado', response.data);
-        alert('Registro realizado com sucesso!'); 
-     
-      } catch (error) {
-        console.error('Erro ao registrar', error.response.data);
-        alert('Erro ao registrar: ' + error.response.data.message || 'Erro desconhecido.'); 
+      async handleRegister() {
+        const formToSubmit = {
+          ...this.form,
+          cpf: this.form.cpf.replace(/\D/g, '') 
+        };
+  
+        try {
+          const response = await axios.post('http://localhost:8000/api/register', formToSubmit);
+          console.log('Registro realizado', response.data);
+          alert('Registro realizado com sucesso!');
+          this.$router.push('/login'); 
+        } catch (error) {
+          console.error('Erro ao registrar', error.response?.data);
+          alert('Erro ao registrar: ' + (error.response?.data?.message || 'Erro desconhecido.'));
+        }
+      },
+      formatCpf() {
+        let cpf = this.form.cpf.replace(/\D/g, '');
+  
+        if (cpf.length <= 11) {
+          cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
+          cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
+          cpf = cpf.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+        }
+  
+        this.form.cpf = cpf;
       }
     },
-  },
-};
+  };
   </script>
   
+  
   <style scoped>
-  /* Mantém o mesmo estilo do componente de login */
   #main {
     display: flex;
     justify-content: center;
@@ -181,7 +196,7 @@
   #linkForm .link {
     font-family: 'Poppins', sans-serif;
     font-size: 12px;
-    color: #007BFF;
+    color: #555;
     text-decoration: none;
     transition: color 0.3s ease;
   }
