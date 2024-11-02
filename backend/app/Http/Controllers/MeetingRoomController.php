@@ -3,14 +3,27 @@
 namespace App\Http\Controllers;
 
 use App\Models\MeetingRoom;
+use App\Models\Meeting;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Carbon\Carbon; 
 
 class MeetingRoomController extends Controller
 {
     public function index()
     {
         return MeetingRoom::all(); 
+    }
+
+    public function getOccupiedHours($roomId, $date)
+    {
+        $validatedDate = Carbon::createFromFormat('Y-m-d', $date);
+
+        $occupiedMeetings = Meeting::where('meeting_room_id', $roomId)
+            ->whereDate('meeting_date', $validatedDate)
+            ->get(['start_time', 'end_time']);
+
+        return response()->json($occupiedMeetings);
     }
 
     /**
@@ -36,8 +49,8 @@ class MeetingRoomController extends Controller
      */
     public function show($id)
     {
-        $room = MeetingRoom::findOrFail($id); // Busca a sala pelo ID
-        return response()->json($room); // Retorna a sala como JSON
+        $room = MeetingRoom::findOrFail($id);
+        return response()->json($room); 
     }
 
     /**
@@ -65,7 +78,7 @@ class MeetingRoomController extends Controller
     public function destroy($id)
     {
         $room = MeetingRoom::findOrFail($id); 
-        $room->delete(); // Deleta a sala
+        $room->delete(); 
         return response()->json(null, Response::HTTP_NO_CONTENT); 
     }
 }
