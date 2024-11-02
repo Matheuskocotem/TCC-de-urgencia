@@ -5,7 +5,7 @@
     <div class="main-content">
       <header class="header">
         <div class="header-content">
-          <h1>Dashboard de Agendamento</h1> <!-- Título Adicionado -->
+          <h1>Dashboard de Agendamento</h1>
           <button v-if="activePage === 'meetings'" class="btn btn-primary" @click="showAddReservationModal = true">
             <PlusIcon class="icon" />
             Nova Reserva
@@ -13,7 +13,6 @@
         </div>
       </header>
       
-      <!-- O restante do conteúdo do dashboard -->
       <div class="summary-cards">
         <div v-for="(card, index) in summaryCards" :key="index" class="card">
           <div class="card-content">
@@ -41,36 +40,40 @@
           </div>
         </div>
       </div>
+
+      <!-- Novo componente de calendário -->
+      <div class="calendar-container">
+        <h2>Calendário de Reuniões</h2>
+        <MeetingCalendar />
+      </div>
     </div>
   </div>
 </template>
-
 
 <script setup>
 import { ref } from 'vue'
 import RoomOccupancyChart from '../components/RoomOccupancyChart.vue'
 import ReservationsPerDayChart from '../components/ReservationsPerDayChart.vue'
 import AdminSidebar from '../components/AdminSidebar.vue'
+import MeetingCalendar from '../components/MeetingCalendar.vue' // Importando o componente do calendário
 
 const summaryCards = ref([
   { title: 'Total de Reservas', value: '156', icon: 'fas fa-calendar' }, 
   { title: 'Salas Disponíveis', value: '8', icon: 'fas fa-th' }, 
   { title: 'Usuários Ativos', value: '42', icon: 'fas fa-users' }, 
 ])
-
-
 </script>
 
 <style scoped>
 .sidebar {
-  position: fixed; /* Fixa a barra lateral */
+  position: fixed;
   left: 0;
   top: 0;
-  height: 100vh; /* Altura total da tela */
-  width: 250px; /* Largura da sidebar */
-  background-color: #ffffff; /* Cor de fundo da sidebar */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Sombra suave */
-  z-index: 10; /* Coloca a sidebar acima do conteúdo */
+  height: 100vh;
+  width: 250px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  z-index: 10;
 }
 
 .main-content {
@@ -138,5 +141,9 @@ const summaryCards = ref([
 
 .chart {
   height: 300px;
+}
+
+.calendar-container {
+  margin-top: 40px; /* Espaçamento para separar do conteúdo acima */
 }
 </style>

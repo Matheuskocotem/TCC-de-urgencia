@@ -32,7 +32,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import SideBar from '../components/Sidebar.vue' // Importando o componente SideBar
+import SideBar from '../components/Sidebar.vue' 
 import Calendar from '../components/Calendar.vue'
 import ReservationModal from '../components/ReservationModal.vue'
 
