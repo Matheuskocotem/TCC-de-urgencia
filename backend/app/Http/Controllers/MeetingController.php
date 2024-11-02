@@ -16,6 +16,18 @@ class MeetingController extends Controller
         return response()->json($meetings);
     }
 
+    public function getMeetingsByDay($date)
+    {
+        // Valida a data recebida
+        $validatedDate = Carbon::createFromFormat('Y-m-d', $date);
+        
+        // Busca as reuniões para a data especificada
+        $meetings = Meeting::whereDate('meeting_date', $validatedDate)->get();
+
+        return response()->json($meetings);
+    }
+
+
     // Criar uma nova reunião
     public function store(Request $request)
     {
