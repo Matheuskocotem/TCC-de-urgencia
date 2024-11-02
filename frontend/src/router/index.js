@@ -24,7 +24,8 @@ const router = createRouter({
       name: 'salas',
       component: () => import('../views/EscolherSala.vue'),
       meta: {
-        title: 'salas'
+        title: 'salas',
+        requiresAuth: true // Protegendo esta rota
       }
     },
     {
@@ -32,7 +33,8 @@ const router = createRouter({
       name: 'VizualiazarReunioes',
       component: () => import('../views/reunioes.vue'),
       meta: {
-        title: 'caleendario'
+        title: 'caleendario',
+        requiresAuth: true // Protegendo esta rota
       }
     },
     {
@@ -40,7 +42,8 @@ const router = createRouter({
       name: 'Reunioes',
       component: () => import('../views/VizualiazarReunioes.vue'),
       meta: {
-        title: 'VizualiazarReunioes'
+        title: 'VizualiazarReunioes',
+        requiresAuth: true // Protegendo esta rota
       }
     },
     {
@@ -48,15 +51,27 @@ const router = createRouter({
       name: 'admin',
       component: () => import('../views/AdminDashboard.vue'),
       meta: {
-        title: 'admin'
+        title: 'admin',
+        requiresAuth: true // Protegendo esta rota
       }
     },
   ]
 })
 
+
 router.beforeEach((to, from, next) => {
   document.title = to.meta.title;
-  next();
+  
+  if (to.meta.requiresAuth) {
+    const isAuthenticated = !!localStorage.getItem('token'); 
+    if (!isAuthenticated) {
+      next({ name: 'login' });
+    } else {
+      next();
+    }
+  } else {
+    next();
+  }
 });
 
-export default router
+export default router;
