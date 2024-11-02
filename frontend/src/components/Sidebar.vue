@@ -1,7 +1,7 @@
 <template>
   <aside class="sidebar">
     <div class="logo">
-      <img alt="Logo" src="@/assets/logo.svg" width="40" height="40" />
+      <img alt="Logo" src="../Img/Logoditis.png" width="40" height="40" />
     </div>
     <nav>
       <RouterLink to="/" class="nav-item">
@@ -67,6 +67,17 @@ const logout = async () => {
 
 
 <style scoped>
+
+.logo {
+  margin-bottom: 4rem;
+  text-align: center;
+}
+
+.logo img {
+  width: 150px; /* Aumente este valor conforme necessário */
+  height: auto; /* Mantém a proporção da imagem */
+}
+
 .sidebar {
   width: 250px;
   background-color: #f3f4f6;
