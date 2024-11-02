@@ -70,6 +70,7 @@ const deleteRoom = (id) => {
 </script>
 
 <style scoped>
+/* Estilo da Sidebar */
 .sidebar {
   position: fixed; 
   left: 0;
@@ -81,32 +82,31 @@ const deleteRoom = (id) => {
   z-index: 10;
 }
 
+/* Layout principal */
 .rooms {
   margin-left: 250px;
   padding: 1rem; 
 }
 
-.rooms-table,
-.meetings-table {
+/* Estilo da tabela de salas */
+.rooms-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 1rem;
 }
 
 .rooms-table th,
-.rooms-table td,
-.meetings-table th,
-.meetings-table td {
+.rooms-table td {
   border: 1px solid #e5e7eb;
   padding: 0.5rem;
   text-align: left;
 }
 
-.rooms-table th,
-.meetings-table th {
+.rooms-table th {
   background-color: #f3f4f6;
 }
 
+/* Estilos dos botões */
 .btn {
   padding: 0.5rem 1rem;
   border-radius: 4px;

@@ -16,7 +16,7 @@
           <Calendar class="icon" />
           <span>Reuniões</span>
         </RouterLink>
-        <RouterLink to="/admin/usuarios" class="nav-item">
+        <RouterLink to="/useradmin" class="nav-item">
           <UserCircle class="icon" />
           <span>Usuários</span>
         </RouterLink>
