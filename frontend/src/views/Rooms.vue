@@ -1,0 +1,158 @@
+<template>
+  <div class="rooms">
+    <AdminSidebar />
+
+    <h2>Gerenciar Salas</h2>
+    <button class="btn btn-primary" @click="showAddRoomModal = true">
+      Adicionar Nova Sala
+    </button>
+    <table class="rooms-table">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Capacidade</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="room in rooms" :key="room.id">
+          <td>{{ room.name }}</td>
+          <td>{{ room.capacity }}</td>
+          <td>
+            <button class="btn btn-edit" @click="editRoom(room)">Editar</button>
+            <button class="btn btn-delete" @click="deleteRoom(room.id)">Excluir</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <Modal :show="showAddRoomModal" @close="showAddRoomModal = false" title="Adicionar Nova Sala">
+      <template #default>
+        <form @submit.prevent="addRoom">
+          <div class="form-group">
+            <label for="roomName">Nome da Sala:</label>
+            <input type="text" id="roomName" v-model="newRoom.name" required>
+          </div>
+          <div class="form-group">
+            <label for="roomCapacity">Capacidade:</label>
+            <input type="number" id="roomCapacity" v-model="newRoom.capacity" required min="1">
+          </div>
+          <div class="modal-actions">
+            <button type="submit" class="btn btn-primary">Adicionar</button>
+            <button type="button" class="btn btn-secondary" @click="showAddRoomModal = false">Cancelar</button>
+          </div>
+        </form>
+      </template>
+    </Modal>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import Modal from '../components/modal.vue'
+import AdminSidebar from '../components/AdminSidebar.vue'
+
+const rooms = ref([]) 
+const showAddRoomModal = ref(false)
+const newRoom = ref({ name: '', capacity: null })
+
+const addRoom = () => {
+  // Lógica para adicionar sala
+}
+
+const editRoom = (room) => {
+  // Lógica para editar sala
+}
+
+const deleteRoom = (id) => {
+  // Lógica para excluir sala
+}
+</script>
+
+<style scoped>
+.sidebar {
+  position: fixed; 
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: 250px;
+  background-color: #ffffff; 
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); 
+  z-index: 10;
+}
+
+.rooms {
+  margin-left: 250px;
+  padding: 1rem; 
+}
+
+.rooms-table,
+.meetings-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.rooms-table th,
+.rooms-table td,
+.meetings-table th,
+.meetings-table td {
+  border: 1px solid #e5e7eb;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.rooms-table th,
+.meetings-table th {
+  background-color: #f3f4f6;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-primary {
+  background-color: #3b82f6;
+  color: #fff;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #2563eb;
+}
+
+.btn-secondary {
+  background-color: #9ca3af;
+  color: #fff;
+  border: none;
+}
+
+.btn-secondary:hover {
+  background-color: #6b7280;
+}
+
+.btn-edit {
+  background-color: #10b981;
+  color: #fff;
+  border: none;
+  margin-right: 0.5rem;
+}
+
+.btn-edit:hover {
+  background-color: #059669;
+}
+
+.btn-delete {
+  background-color: #ef4444;
+  color: #fff;
+  border: none;
+}
+
+.btn-delete:hover {
+  background-color: #dc2626;
+}
+</style>
