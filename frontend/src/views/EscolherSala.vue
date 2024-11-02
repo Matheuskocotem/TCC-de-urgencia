@@ -24,38 +24,65 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import RoomList from '../components/RoomList.vue'
-import ReservationModal from '../components/ReservationModalSalas.vue'
-import SideBar from '../components/Sidebar.vue'
+import { ref, computed, onMounted } from 'vue';
+import RoomList from '../components/RoomList.vue';
+import ReservationModal from '../components/ReservationModalSalas.vue';
+import SideBar from '../components/Sidebar.vue';
+import api from '../services/HttpService.js';
 
 // Dados mockados
-const rooms = ref([
-  { id: 1, name: 'Sala Executiva', capacity: 10, resources: ['Projetor', 'Quadro Branco'], availableSlots: ['09:00', '11:00', '14:00'] },
-  { id: 2, name: 'Sala de Brainstorming', capacity: 6, resources: ['Quadro Branco'], availableSlots: ['10:00', '13:00', '15:00'] },
-  { id: 3, name: 'Sala de Conferência', capacity: 20, resources: ['Projetor', 'Videoconferência'], availableSlots: ['09:00', '14:00', '16:00'] },
-  { id: 4, name: 'Sala Pequena', capacity: 4, resources: ['TV'], availableSlots: ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'] },
-])
+const rooms = ref([]);
+const filteredRooms = computed(() => rooms.value);
 
-const filteredRooms = computed(() => rooms.value)
+const showReservationModal = ref(false);
+const selectedRoom = ref(null);
 
-const showReservationModal = ref(false)
-const selectedRoom = ref(null)
 
+const isAuthenticated = () => {
+  const token = localStorage.getItem('token');
+  return token !== null;
+};
+
+// Função para buscar as salas
+const fetchRooms = async () => {
+  if (!isAuthenticated()) {
+    console.error('Usuário não autenticado');
+    // Aqui você pode redirecionar para a página de login, se necessário
+    return;
+  }
+  
+  try {
+    const response = await api.get('/api/meeting-rooms');
+    rooms.value = response.data; 
+  } catch (error) {
+    console.error('Erro ao buscar salas:', error.response?.data || error.message);
+  }
+};
+
+// Funções para abrir e fechar o modal de reserva
 const openReservationModal = (room) => {
-  selectedRoom.value = room
-  showReservationModal.value = true
+  selectedRoom.value = room;
+  showReservationModal.value = true;
 }
 
 const closeReservationModal = () => {
-  showReservationModal.value = false
-  selectedRoom.value = null
+  showReservationModal.value = false;
+  selectedRoom.value = null;
 }
 
-const submitReservation = (reservationData) => {
-  console.log('Reserva submetida:', reservationData)
-  closeReservationModal()
-}
+// Função para submeter a reserva
+const submitReservation = async (reservationData) => {
+  try {
+    const response = await api.post('/api/meetings', reservationData); 
+    console.log('Reserva submetida:', response.data);
+    closeReservationModal();
+  } catch (error) {
+    console.error('Erro ao submeter reserva:', error.response?.data || error.message);
+  }
+};
+
+// Chama a função fetchRooms ao montar o componente
+onMounted(fetchRooms);
 </script>
 
 <style scoped>

@@ -1,5 +1,8 @@
 <template>
   <div class="room-list">
+    <div v-if="rooms.length === 0" class="no-rooms">
+      <p>Nenhuma sala disponível.</p>
+    </div>
     <div v-for="room in rooms" :key="room.id" class="room-card">
       <div class="room-content">
         <h3 class="room-name">{{ room.name }}</h3>
@@ -27,7 +30,10 @@
         </div>
       </div>
       <div class="room-footer">
-        <button @click="$emit('open-reservation', room)" class="reserve-button">
+        <button 
+          @click="$emit('open-reservation', room)" 
+          class="reserve-button" 
+          aria-label="Reservar {{ room.name }}">
           Reservar
         </button>
       </div>
@@ -50,19 +56,26 @@ defineEmits(['open-reservation'])
   gap: 16px;
 }
 
+.no-rooms {
+  grid-column: span 100%; /* Ocupa todas as colunas */
+  text-align: center; /* Centraliza o texto */
+  font-size: 1.25rem;
+  color: #666;
+}
+
 .room-card {
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   display: flex;
-  flex-direction: column; /* Organiza conteúdo verticalmente */
-  height: 100%; /* Mesma altura para todos os cartões */
+  flex-direction: column; 
+  height: 100%; 
 }
 
 .room-content {
   padding: 16px;
-  flex-grow: 1; /* Permite que o conteúdo ocupe o espaço disponível */
+  flex-grow: 1; 
 }
 
 .room-name {
@@ -104,14 +117,14 @@ defineEmits(['open-reservation'])
 }
 
 .slot-list {
-  display: flex; /* Exibe slots em linha */
-  flex-wrap: wrap; /* Permite que os slots se movam para a próxima linha se não houver espaço */
-  gap: 8px; /* Espaçamento entre os slots */
+  display: flex; 
+  flex-wrap: wrap; 
+  gap: 8px; 
 }
 
 .slot {
-  background-color: #c6f6d5; /* Verde claro */
-  color: #276749; /* Verde escuro */
+  background-color: #c6f6d5; 
+  color: #276749; 
   font-size: 0.75rem;
   font-weight: 600;
   padding: 4px 8px;
@@ -119,14 +132,14 @@ defineEmits(['open-reservation'])
 }
 
 .room-footer {
-  background-color: #f7fafc; /* Cinza claro */
+  background-color: #f7fafc; 
   padding: 16px;
 }
 
 .reserve-button {
   width: 100%;
   padding: 10px;
-  background-color: #4c51bf; /* Azul */
+  background-color: #4c51bf; 
   color: white;
   border: none;
   border-radius: 4px;
@@ -137,6 +150,6 @@ defineEmits(['open-reservation'])
 }
 
 .reserve-button:hover {
-  background-color: #434190; /* Azul mais escuro */
+  background-color: #434190; 
 }
 </style>
