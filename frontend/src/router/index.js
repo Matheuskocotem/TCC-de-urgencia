@@ -55,6 +55,33 @@ const router = createRouter({
         requiresAuth: true // Protegendo esta rota
       }
     },
+    {
+      path: '/admindash',
+      name: 'admindash',
+      component: () => import('../views/Dashboard.vue'),
+      meta: {
+        title: 'admindash',
+        requiresAuth: true // Protegendo esta rota
+      }
+    },
+    {
+      path: '/roomsAdmin',
+      name: 'roomsAdmin',
+      component: () => import('../views/Rooms.vue'),
+      meta: {
+        title: 'roomsAdmin',
+        requiresAuth: true // Protegendo esta rota
+      }
+    },
+    {
+      path: '/meetingsadmin',
+      name: 'meetingsadmin',
+      component: () => import('../views/Meetings.vue'),
+      meta: {
+        title: 'meetingsAdmin',
+        requiresAuth: true 
+      }
+    },
   ]
 })
 
