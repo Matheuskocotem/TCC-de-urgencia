@@ -19,8 +19,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('/{id}', [MeetingRoomController::class, 'show']); 
         });
 
-        // Rotas para reuniões
         Route::prefix('meetings')->group(function () {
+            Route::get('/day/{date}', [MeetingController::class, 'getMeetingsByDay']);
             Route::get('/', [MeetingController::class, 'index']); 
             Route::post('/', [MeetingController::class, 'store']); 
             Route::get('/{id}', [MeetingController::class, 'show']); 
@@ -35,6 +35,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::prefix('meeting-rooms')->group(function () {
             Route::post('/', [MeetingRoomController::class, 'store']); 
+            Route::get('/{roomId}/occupancies/day/{date}', [MeetingRoomController::class, 'getOccupiedHours']);
             Route::put('/{id}', [MeetingRoomController::class, 'update']); 
             Route::delete('/{id}', [MeetingRoomController::class, 'destroy']); 
         });
