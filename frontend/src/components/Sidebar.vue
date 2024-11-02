@@ -35,20 +35,36 @@
 
 <script setup>
 import { ref } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import { UserCircle, LogOut, Calendar, Home, Users } from 'lucide-vue-next'
+import axios from 'axios'
+import { toast } from 'vue3-toastify'
 
 const showProfileMenu = ref(false)
+const router = useRouter() 
 
 const toggleProfileMenu = () => {
   showProfileMenu.value = !showProfileMenu.value
 }
 
-const logout = () => {
-  // Implementar lógica de logout
-  console.log('Logout')
+const logout = async () => {
+  try {
+    await axios.post('http://localhost:8000/api/logout', {}, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+
+    localStorage.removeItem('token')
+    toast.success("Logout realizado com sucesso!", { autoClose: 10000 });
+    router.push('/login') 
+  } catch (error) {
+    console.error('Erro ao fazer logout:', error)
+    toast.error("Erro ao fazer logout!", { autoClose: 10000});
+  }
 }
 </script>
+
 
 <style scoped>
 .sidebar {

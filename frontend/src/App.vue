@@ -1,6 +1,7 @@
 <script setup>
 import { RouterView } from 'vue-router'
-import Sidebar from '@/components/Sidebar.vue' // Ajuste o caminho conforme necessário
+import Sidebar from '@/components/Sidebar.vue'
+import 'vue3-toastify/dist/index.css'; 
 </script>
 
 <template>
