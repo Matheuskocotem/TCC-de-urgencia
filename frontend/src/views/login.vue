@@ -17,9 +17,10 @@
         <input
           type="text"
           placeholder="Digite seu CPF"
+          v-model="cpf"
+          @input="formatCpf"
+          maxlength="14"
           required
-          pattern="\d{3}\.\d{3}\.\d{3}-\d{2}"
-          title="Digite um CPF válido no formato 000.000.000-00"
           aria-label="CPF"
         />
 
@@ -27,18 +28,21 @@
         <input
           type="password"
           placeholder="Digite sua senha"
+          v-model="password"
           required
           aria-label="Senha"
         />
+
+        <!-- Link de esqueci a senha -->
+        <a href="#" class="forgot-password">Esqueceu sua senha?</a>
 
         <!-- Botão de Login -->
         <button type="submit">Entrar</button>
       </form>
 
-      <!-- Link de esqueci a senha -->
+      <!-- Link de registro -->
       <div id="linkForm">
-        <a href="#" class="link">Esqueci minha senha</a>
-        <a href="register" class="link">Registre-se</a>
+        <a href="register" class="link">Não tem uma conta? Registre-se</a>
       </div>
     </div>
 
@@ -51,10 +55,11 @@
 
 <script>
 import axios from 'axios';
+import { toast } from 'vue3-toastify';
 
 export default {
-  data(){
-    return{
+  data() {
+    return {
       cpf: '',
       password: '',
     };
@@ -63,20 +68,30 @@ export default {
     async handleLogin() {
       try {
         const response = await axios.post('http://localhost:8000/api/login', {
-          cpf: this.cpf,
+          cpf: this.cpf.replace(/\D/g, ''), 
           password: this.password,
         });
 
         console.log("Login realizado", response.data);
-
         localStorage.setItem('token', response.data.token);
-
+        toast.success("Login realizado com sucesso!", { autoClose: 5000 });
         this.$router.push('/');
-      }catch (error) {
+      } catch (error) {
         console.error("Erro ao fazer login:", error.response.data);
-        alert("Login falhou. Verifique seu CPF e senha.");
+        toast.error("Login falhou. Verifique seu CPF e senha.", { autoClose: 5000 });
       }
-    }
+    },
+    formatCpf() {
+      let cpf = this.cpf.replace(/\D/g, ''); 
+
+      if (cpf.length <= 11) {
+        cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
+        cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
+        cpf = cpf.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+      }
+
+      this.cpf = cpf;
+    },
   },
 };
 </script>
@@ -104,14 +119,6 @@ export default {
   width: 150px;
   height: auto;
   margin-bottom: 20px;
-}
-
-#titleArea .h1s {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600;
-  font-size: 24px;
-  color: #333;
-  margin-bottom: 10px;
 }
 
 #titleArea p {
@@ -142,20 +149,30 @@ export default {
   outline: none;
 }
 
+.forgot-password {
+  width: 100%;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  color: #555;
+  text-align: left;
+  margin-top: -5px;
+  margin-bottom: 15px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
 #linkForm {
   display: flex;
   justify-content: center;
-  width: 100%;
-  margin: 10px 0;
+  margin-top: 15px;
 }
 
 #linkForm .link {
   font-family: 'Poppins', sans-serif;
   font-size: 12px;
-  color: #007BFF;
+  color: #555;
   text-decoration: none;
   transition: color 0.3s ease;
-  margin: 0 5px; /* Espaçamento entre os links */
 }
 
 #linkForm .link:hover {
@@ -173,7 +190,6 @@ export default {
   font-family: 'Poppins', sans-serif;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  margin-top: 15px;
 }
 
 #form button:hover {
