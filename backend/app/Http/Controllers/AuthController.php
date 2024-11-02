@@ -36,6 +36,30 @@ class AuthController extends Controller
     
         return response()->json(['message' => 'Usuário registrado com sucesso!']);
     }
+
+    public function addAdmin(Request $request) 
+    {
+    $request->validate([
+        'name' => 'required|string',
+        'email' => 'required|string|email|unique:users',
+        'cpf' => 'required|string|max:11|unique:users',
+        'password' => 'required|string|min:8|confirmed',
+    ]);
+
+    if (auth()->check() && auth()->user()->role !== 'admin') {
+        return response()->json(['message' => 'Acesso negado. Somente administradores podem adicionar outros administradores.'], 403);
+    }
+
+    $admin = User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'cpf' => $request->cpf,
+        'password' => Hash::make($request->password),
+        'role' => 'admin', 
+    ]);
+
+    return response()->json(['message' => 'Administrador registrado com sucesso!']);
+    }
     
     public function update(Request $request, $id) 
     {
