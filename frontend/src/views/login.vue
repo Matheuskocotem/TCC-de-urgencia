@@ -1,19 +1,13 @@
 <template>
   <div id="main">
     <div id="main-container">
-      <!-- Logo do DITIS -->
       <div id="logoArea">
         <img src="../Img/Logoditis.png" alt="Logo DITIS" />
       </div>
-
-      <!-- Título do formulário -->
       <div id="titleArea">
         <p>Entre com seu CPF e senha</p>
       </div>
-
-      <!-- Formulário de login -->
       <form id="form" @submit.prevent="handleLogin">
-        <!-- Campo de CPF -->
         <input
           type="text"
           placeholder="Digite seu CPF"
@@ -23,8 +17,6 @@
           required
           aria-label="CPF"
         />
-
-        <!-- Campo de Senha -->
         <input
           type="password"
           placeholder="Digite sua senha"
@@ -32,21 +24,13 @@
           required
           aria-label="Senha"
         />
-
-        <!-- Link de esqueci a senha -->
         <a href="#" class="forgot-password">Esqueceu sua senha?</a>
-
-        <!-- Botão de Login -->
         <button type="submit">Entrar</button>
       </form>
-
-      <!-- Link de registro -->
       <div id="linkForm">
         <a href="register" class="link">Não tem uma conta? Registre-se</a>
       </div>
     </div>
-
-    <!-- Footer -->
     <footer id="footer">
       <p>© 2024 by Nexgen Arch</p>
     </footer>
@@ -68,21 +52,34 @@ export default {
     async handleLogin() {
       try {
         const response = await axios.post('http://localhost:8000/api/login', {
-          cpf: this.cpf.replace(/\D/g, ''), 
+          cpf: this.cpf.replace(/\D/g, ''),
           password: this.password,
         });
 
-        console.log("Login realizado", response.data);
+        console.log("Login realizado:", response.data); // Verifique a resposta aqui
         localStorage.setItem('token', response.data.token);
+        localStorage.setItem('role', response.data.role);
         toast.success("Login realizado com sucesso!", { autoClose: 5000 });
-        this.$router.push('/');
+
+        // Verifique se o papel (role) está definido
+        if (response.data.role) {
+          // Redirecionar com base no papel do usuário
+          if (response.data.role === 'admin') {
+            this.$router.push({ name: 'admindash' });
+          } else {
+            this.$router.push({ name: 'VizualiazarReunioes' });
+          }
+        } else {
+          console.error("Papel do usuário não encontrado");
+          toast.error("Papel do usuário não encontrado. Tente novamente.", { autoClose: 5000 });
+        }
       } catch (error) {
         console.error("Erro ao fazer login:", error.response.data);
         toast.error("Login falhou. Verifique seu CPF e senha.", { autoClose: 5000 });
       }
     },
     formatCpf() {
-      let cpf = this.cpf.replace(/\D/g, ''); 
+      let cpf = this.cpf.replace(/\D/g, '');
 
       if (cpf.length <= 11) {
         cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
@@ -97,6 +94,7 @@ export default {
 </script>
 
 <style scoped>
+
 #main {
   display: flex;
   justify-content: center;
