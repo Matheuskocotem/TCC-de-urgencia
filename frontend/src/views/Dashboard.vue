@@ -3,20 +3,12 @@
     <AdminSidebar />
 
     <div class="main-content">
-      <header class="header">
-        <div class="header-content">
-          <h1>Dashboard de Agendamento</h1>
-          <button v-if="activePage === 'meetings'" class="btn btn-primary" @click="showAddReservationModal = true">
-            <PlusIcon class="icon" />
-            Nova Reserva
-          </button>
-        </div>
-      </header>
-      
+      <h1 class="py-5">Dashboard de Agendamento</h1>
+
       <div class="summary-cards">
         <div v-for="(card, index) in summaryCards" :key="index" class="card">
           <div class="card-content">
-            <i :class="card.icon" class="card-icon"></i>
+            <i :class="card.icon" class="card-icon pr-5"></i>
             <div>
               <p class="card-title">{{ card.title }}</p>
               <p class="card-value">{{ card.value }}</p>
@@ -51,17 +43,17 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import RoomOccupancyChart from '../components/RoomOccupancyChart.vue'
-import ReservationsPerDayChart from '../components/ReservationsPerDayChart.vue'
-import AdminSidebar from '../components/AdminSidebar.vue'
-import MeetingCalendar from '../components/MeetingCalendar.vue' // Importando o componente do calendário
+import { ref } from "vue";
+import RoomOccupancyChart from "../components/RoomOccupancyChart.vue";
+import ReservationsPerDayChart from "../components/ReservationsPerDayChart.vue";
+import AdminSidebar from "../components/AdminSidebar.vue";
+import MeetingCalendar from "../components/MeetingCalendar.vue"; // Importando o componente do calendário
 
 const summaryCards = ref([
-  { title: 'Total de Reservas', value: '156', icon: 'fas fa-calendar' }, 
-  { title: 'Salas Disponíveis', value: '8', icon: 'fas fa-th' }, 
-  { title: 'Usuários Ativos', value: '42', icon: 'fas fa-users' }, 
-])
+  { title: "Total de Reservas", value: "156", icon: "fas fa-calendar" },
+  { title: "Salas Disponíveis", value: "8", icon: "fas fa-th" },
+  { title: "Usuários Ativos", value: "42", icon: "fas fa-users" },
+]);
 </script>
 
 <style scoped>
@@ -97,14 +89,16 @@ const summaryCards = ref([
 
 .dashboard {
   padding: 20px;
-  margin-left: 250px; 
+  margin-left: 250px;
+  background: #f8f9fa;
+  font-family: Inter;
 }
 
 .summary-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
-  margin-bottom: 40px; 
+  margin-bottom: 40px;
 }
 
 .card {
@@ -129,7 +123,7 @@ const summaryCards = ref([
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 2rem;
-  margin-top: 20px; 
+  margin-top: 20px;
 }
 
 .chart-card {
@@ -145,5 +139,14 @@ const summaryCards = ref([
 
 .calendar-container {
   margin-top: 40px; /* Espaçamento para separar do conteúdo acima */
+}
+
+i{
+  color:#2B73B4;
+  font-size: 30px;
+}
+.card-value{
+  font-size: 30px;
+  font-weight: 600;
 }
 </style>

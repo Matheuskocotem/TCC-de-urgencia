@@ -1,11 +1,12 @@
 <template>
   <div class="rooms">
     <AdminSidebar />
-
-    <h2>Gerenciar Salas</h2>
-    <button class="btn btn-primary" @click="showAddRoomModal = true">
-      Adicionar Nova Sala
-    </button>
+    <div class="d-flex justify-content-between">
+      <h2>Gerenciar Salas</h2>
+      <button class="btn btn-primary" @click="showAddRoomModal = true">
+        Adicionar Nova Sala
+      </button>
+    </div>
     <table class="rooms-table">
       <thead>
         <tr>
@@ -84,6 +85,7 @@ const deleteRoom = (id) => {
 
 /* Layout principal */
 .rooms {
+  font-family: Inter;
   margin-left: 250px;
   padding: 1rem; 
 }
