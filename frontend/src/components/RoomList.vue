@@ -42,6 +42,30 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+
+const rooms = ref([])
+
+const api = axios.create({
+  baseURL: 'http://localhost:8000/api',
+})
+
+const fetchRooms = async () => {
+  try {
+    const response = await api.get('/meeting-rooms/')
+    rooms.value = response.data.map(room => ({
+      ...room,
+      availableSlots: room.disponibilidade,  // Mapeando disponibilidade para availableSlots
+    }))
+  } catch (error) {
+    console.error('Erro ao buscar salas:', error.response?.data || error.message)
+  }
+}
+
+// Chamando fetchRooms ao montar o componente
+onMounted(fetchRooms)
+
 defineProps({
   rooms: Array
 })
