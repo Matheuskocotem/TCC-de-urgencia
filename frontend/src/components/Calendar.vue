@@ -41,3 +41,12 @@ const calendarApp = createCalendar({
     <ScheduleXCalendar :calendar-app="calendarApp" />
   </div>
 </template>
+
+<style>
+.sx-vue-calendar-wrapper {
+  width: auto;
+  max-width: 100vw;
+  height: 800px;
+  max-height: 90vh;
+}
+</style>
