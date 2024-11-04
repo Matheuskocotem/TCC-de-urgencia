@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import { mapActions } from 'vuex';
 import { toast } from 'vue3-toastify';
 
 export default {
@@ -49,35 +49,39 @@ export default {
     };
   },
   methods: {
+    ...mapActions(['login']),
     async handleLogin() {
-      try {
-        const response = await axios.post('http://localhost:8000/api/login', {
-          cpf: this.cpf.replace(/\D/g, ''),
-          password: this.password,
-        });
+  try {
+    const response = await this.$store.dispatch('login', {
+      cpf: this.cpf,
+      password: this.password,
+    });
 
-        console.log("Login realizado:", response.data); // Verifique a resposta aqui
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('role', response.data.role);
-        toast.success("Login realizado com sucesso!", { autoClose: 5000 });
+    // Logando a resposta para verificar o conteúdo
+    console.log("Dados do usuário:", response); // Verifique os dados aqui
 
-        // Verifique se o papel (role) está definido
-        if (response.data.role) {
-          // Redirecionar com base no papel do usuário
-          if (response.data.role === 'admin') {
-            this.$router.push({ name: 'admindash' });
-          } else {
-            this.$router.push({ name: 'VizualiazarReunioes' });
-          }
-        } else {
-          console.error("Papel do usuário não encontrado");
-          toast.error("Papel do usuário não encontrado. Tente novamente.", { autoClose: 5000 });
-        }
-      } catch (error) {
-        console.error("Erro ao fazer login:", error.response.data);
-        toast.error("Login falhou. Verifique seu CPF e senha.", { autoClose: 5000 });
+    // Armazenando informações no localStorage
+    localStorage.setItem('token', response.token);
+    localStorage.setItem('role', response.role);
+    toast.success("Login realizado com sucesso!", { autoClose: 5000 });
+
+    // Verifique se o papel (role) está definido
+    if (response.role) {
+      // Redirecionar com base no papel do usuário
+      if (response.role === 'admin') {
+        this.$router.push({ name: 'admindash' });
+      } else {
+        this.$router.push({ name: 'VizualiazarReunioes' });
       }
-    },
+    } else {
+      console.error("Papel do usuário não encontrado");
+      toast.error("Papel do usuário não encontrado. Tente novamente.", { autoClose: 5000 });
+    }
+  } catch (error) {
+    console.error("Erro ao fazer login:", error.response ? error.response.data : error.message);
+    toast.error("Login falhou. Verifique seu CPF e senha.", { autoClose: 5000 });
+  }
+},
     formatCpf() {
       let cpf = this.cpf.replace(/\D/g, '');
 
