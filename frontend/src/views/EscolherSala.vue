@@ -7,6 +7,7 @@
     <div class="content">
       <h1 class="text-3xl font-bold text-gray-800 mb-6">Salas de Reunião</h1>
 
+      <!-- Lista de Salas -->
       <RoomList 
         :rooms="filteredRooms" 
         @open-reservation="openReservationModal"
@@ -30,30 +31,28 @@ import ReservationModal from '../components/ReservationModalSalas.vue';
 import SideBar from '../components/Sidebar.vue';
 import api from '../services/HttpService.js';
 
-// Dados mockados
 const rooms = ref([]);
 const filteredRooms = computed(() => rooms.value);
 
 const showReservationModal = ref(false);
 const selectedRoom = ref(null);
 
-
 const isAuthenticated = () => {
   const token = localStorage.getItem('token');
   return token !== null;
 };
 
-// Função para buscar as salas
+// Função para buscar as salas da API
 const fetchRooms = async () => {
   if (!isAuthenticated()) {
     console.error('Usuário não autenticado');
-    // Aqui você pode redirecionar para a página de login, se necessário
+    // Redirecionamento para login, se necessário
     return;
   }
   
   try {
-    const response = await api.get('/api/meeting-rooms');
-    rooms.value = response.data; 
+    const response = await api.get('http://localhost:8000/api/meeting-rooms/');
+    rooms.value = response.data; // Atribuir resposta ao array rooms
   } catch (error) {
     console.error('Erro ao buscar salas:', error.response?.data || error.message);
   }
@@ -63,12 +62,12 @@ const fetchRooms = async () => {
 const openReservationModal = (room) => {
   selectedRoom.value = room;
   showReservationModal.value = true;
-}
+};
 
 const closeReservationModal = () => {
   showReservationModal.value = false;
   selectedRoom.value = null;
-}
+};
 
 // Função para submeter a reserva
 const submitReservation = async (reservationData) => {
@@ -86,56 +85,52 @@ onMounted(fetchRooms);
 </script>
 
 <style scoped>
-/* Estilos gerais */
 .min-h-screen {
-  background-color: #f7fafc; /* Fundo cinza claro */
+  background-color: #f7fafc;
   display: flex;
 }
 
 .sidebar {
-  position: fixed; /* Fixa a barra lateral */
+  position: fixed;
   left: 0;
   top: 0;
-  height: 100vh; /* Altura total da tela */
-  width: 250px; /* Largura da sidebar */
-  background-color: #ffffff; /* Cor de fundo da sidebar */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra suave */
-  z-index: 10; /* Coloca a sidebar acima do conteúdo */
+  height: 100vh;
+  width: 250px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 10;
 }
 
 .content {
-  margin-left: 250px; /* Margem para o conteúdo principal */
-  flex: 1; /* Permite que o conteúdo principal ocupe o espaço restante */
-  padding: 1rem; /* Espaçamento interno */
+  margin-left: 250px;
+  flex: 1;
+  padding: 1rem;
 }
 
-/* Estilos do RoomList */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Colunas responsivas */
-  gap: 1rem; /* Espaçamento entre os cartões */
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
 }
 
-/* Cartões de salas */
 .bg-white {
-  background-color: #ffffff; /* Fundo branco dos cartões */
+  background-color: #ffffff;
 }
 
 .rounded-lg {
-  border-radius: 0.5rem; /* Bordas arredondadas */
+  border-radius: 0.5rem;
 }
 
 .shadow {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra dos cartões */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Estilos dos botões */
 button {
-  background-color: #4c51bf; /* Cor do botão */
-  color: #ffffff; /* Texto branco no botão */
+  background-color: #4c51bf;
+  color: #ffffff;
 }
 
 button:hover {
-  background-color: #434190; /* Cor do botão ao passar o mouse */
+  background-color: #434190;
 }
 </style>
