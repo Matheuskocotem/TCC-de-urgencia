@@ -97,6 +97,14 @@ const routes = [
       role: 'admin',
     },
   },
+  {
+    path: '/bad-request',
+    name: 'BadRequest',
+    component: () => import('../views/BadRequest.vue'),
+    meta: {
+      title: 'Acesso Negado',
+    },
+  },
 ];
 
 const router = createRouter({
@@ -115,7 +123,7 @@ router.beforeEach((to, from, next) => {
       next({ name: 'login' });
     } else {
       if (to.meta.role && (to.meta.role !== userRole && userRole !== 'admin')) {
-        next({ name: 'login' });
+        next({ name: 'BadRequest' }); 
       } else {
         next();
       }
