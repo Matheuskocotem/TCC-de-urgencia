@@ -23,7 +23,9 @@
             aria-label="Nome"
           />
   
-          <!-- Campo de E-mail -->
+          <!-- git config --global user.name "Matheuskocotem"
+                git config --global user.email "kocotemmatheus@gmail.com"
+Campo de E-mail -->
           <input
             type="email"
             placeholder="Digite seu e-mail"
@@ -126,112 +128,152 @@
   
   
   <style scoped>
-  #main {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    height: 90vh;
-    margin: 0;
-  }
-  
+#main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: 100vh;
+  padding: 10px;
+  margin: 0;
+}
+
+#main-container {
+  width: 100%;
+  max-width: 400px;
+  padding: 30px;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+#logoArea img {
+  width: 150px;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+#titleArea p {
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  color: #555;
+}
+
+#form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#form input {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+#form input:focus {
+  border-color: #28a745;
+  outline: none;
+}
+
+#linkForm {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 10px 0;
+}
+
+#linkForm .link {
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  color: #555;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+#linkForm .link:hover {
+  color: #0056b3;
+}
+
+#form button {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background-color: #28a745;
+  color: white;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 15px;
+}
+
+#form button:hover {
+  background-color: #218838;
+}
+
+#footer {
+  margin-top: 20px;
+}
+
+#footer p {
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  color: #aaa;
+  text-align: center;
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 768px) {
   #main-container {
-    width: 400px;
-    padding: 30px;
-    background-color: rgba(255, 255, 255, 0.95);
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.3);
-    text-align: center;
+    padding: 20px;
+    width: 90%;
   }
-  
-  #logoArea img {
-    width: 150px;
-    height: auto;
-    margin-bottom: 20px;
-  }
-  
-  #titleArea .h1s {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-    font-size: 24px;
-    color: #333;
-    margin-bottom: 10px;
-  }
-  
+
   #titleArea p {
-    font-family: 'Poppins', sans-serif;
     font-size: 14px;
-    color: #555;
   }
-  
-  #form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
+
   #form input {
-    width: 100%;
-    padding: 10px;
-    margin: 8px 0;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 14px;
-    font-family: 'Poppins', sans-serif;
-    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.05);
+    font-size: 13px;
   }
-  
-  #form input:focus {
-    border-color: #28a745; /* Cor de foco verde */
-    outline: none;
-  }
-  
-  #linkForm {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    margin: 10px 0;
-  }
-  
-  #linkForm .link {
-    font-family: 'Poppins', sans-serif;
-    font-size: 12px;
-    color: #555;
-    text-decoration: none;
-    transition: color 0.3s ease;
-  }
-  
-  #linkForm .link:hover {
-    color: #0056b3;
-  }
-  
+
   #form button {
-    width: 100%;
-    padding: 10px;
-    border: none;
-    border-radius: 8px;
-    background-color: #28a745;
-    color: white;
-    font-size: 14px;
-    font-family: 'Poppins', sans-serif;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 15px;
+    font-size: 13px;
+    padding: 8px;
   }
-  
-  #form button:hover {
-    background-color: #218838;
-  }
-  
-  #footer {
-    margin-top: 20px;
-  }
-  
+
   #footer p {
-    font-family: 'Poppins', sans-serif;
-    font-size: 10px;
-    color: #aaa;
-    text-align: center;
+    font-size: 9px;
   }
-  </style>
-  
+}
+
+@media (max-width: 480px) {
+  #main-container {
+    padding: 15px;
+  }
+
+  #logoArea img {
+    width: 120px;
+  }
+
+  #titleArea p {
+    font-size: 12px;
+  }
+
+  #form input, #form button {
+    font-size: 12px;
+  }
+
+  #footer p {
+    font-size: 8px;
+  }
+}
+</style>
