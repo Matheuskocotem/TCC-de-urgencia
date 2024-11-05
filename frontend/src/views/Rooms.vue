@@ -55,8 +55,9 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import AdminSidebar from '../components/AdminSidebar.vue'
+import { ref } from 'vue';
+import AdminSidebar from '../components/AdminSidebar.vue';
+import axios from 'axios';
 
 const rooms = ref([]) 
 const showAddRoomModal = ref(false)
@@ -64,23 +65,18 @@ const newRoom = ref({ nome: '', capacidade: null, localizacao: '' })
 
 const addRoom = async () => {
   try {
-    console.log("Dados enviados:", newRoom.value); // Para depurar os dados enviados
-    const response = await fetch('http://localhost:8000/api/meeting-rooms', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(newRoom.value)
+    console.log("Dados enviados:", { ...newRoom.value }) // Para depurar os dados enviados
+    const response = await axios.post('http://localhost:8000/api/meeting-rooms', {
+      nome: newRoom.value.nome,
+      localizacao: newRoom.value.localizacao,
+      capacidade: newRoom.value.capacidade
     })
-    
-    if (!response.ok) throw new Error('Erro ao adicionar sala')
 
-    const data = await response.json()
-    rooms.value.push(data)
+    rooms.value.push(response.data)
     showAddRoomModal.value = false
     newRoom.value = { nome: '', capacidade: null, localizacao: '' }
   } catch (error) {
-    console.error(error)
+    console.error("Erro ao adicionar sala:", error)
   }
 }
 
