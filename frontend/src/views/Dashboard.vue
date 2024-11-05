@@ -39,8 +39,8 @@
         <MeetingCalendar />
       </div>
     </div>
-  </div>
-</template>
+    </div>
+  </template>
 
 <script setup>
 import { ref } from "vue";

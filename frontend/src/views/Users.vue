@@ -17,14 +17,14 @@
           <thead>
             <tr>
               <th>Nome</th>
-              <th>Email</th>
+              <th>CPF</th>
               <th>Ações</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="user in users" :key="user.id">
               <td>{{ user.name }}</td>
-              <td>{{ user.email }}</td>
+              <td>{{ user.cpf }}</td>
               <td>
                 <button class="btn btn-edit btn-secondary mx-1" @click="editUser(user)">
                   Editar
@@ -58,6 +58,18 @@
                 <input type="email" id="email" class="form-control" v-model="newUser.email" required />
               </div>
               <div class="form-group m-3">
+                <label for="cpf">CPF:</label>
+                <input type="text" id="cpf" class="form-control" v-model="newUser.cpf" required />
+              </div>
+              <div class="form-group m-3">
+                <label for="password">Email:</label>
+                <input type="password" id="password" class="form-control" v-model="newUser.password" required />
+              </div>
+              <div class="form-group m-3">
+                <label for="confirmation_password">Email:</label>
+                <input type="password" id="confirmation_password" class="form-control" v-model="newUser.confirmation_password" required />
+              </div>
+              <div class="form-group m-3">
                 <label for="role">Função:</label>
                 <select id="role" class="form-control" v-model="newUser.role" required>
                   <option value="" disabled>Selecione uma função</option>
@@ -86,7 +98,7 @@ export default {
     return {
       showModal: false,
       isEditing: false,
-      newUser: { id: null, name: "", email: "", role: "" },
+      newUser: { id: null, name: "", email: "", role: "", cpf: "", password: "", confirmation_password: "",},
       users: [],
     };
   },
@@ -97,12 +109,14 @@ export default {
     async fetchUsers() {
       try {
         const response = await axios.get('http://localhost:8000/api/users/index');
-        this.users = response.data;
+        this.users = response.data.users;
       } catch (error) {
         console.error("Erro ao buscar usuários:", error.response ? error.response.data : error.message);
         alert("Erro ao carregar usuários: " + (error.response?.data?.message || "Erro desconhecido."));
       }
     },
+
+
     openModal() {
       this.isEditing = false;
       this.newUser = { id: null, name: "", email: "", role: "" };
