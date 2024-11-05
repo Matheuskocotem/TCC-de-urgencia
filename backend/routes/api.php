@@ -21,6 +21,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('/{roomId}/occupancies/day/{date}', [MeetingRoomController::class, 'getOccupiedHours']);
             Route::put('/{id}', [MeetingRoomController::class, 'update']); 
             Route::delete('/{id}', [MeetingRoomController::class, 'destroy']); 
+            Route::get('/occupancies', [MeetingRoomController::class, 'getOccupancyData']);
         });
     });
 
@@ -37,5 +38,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/index', [AuthController::class, 'index']);
         Route::post('/add-admin', [AuthController::class, 'addAdmin']);
         Route::put('/updateAdmin', [AuthController::class, 'updateAdmin']);
+        Route::get('/summary-data', [AuthController::class, 'getSummaryData']);
     });
+    
 });

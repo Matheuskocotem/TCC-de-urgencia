@@ -15,6 +15,29 @@ class MeetingRoomController extends Controller
         return MeetingRoom::all(); 
     }
 
+    public function getOccupancyData()
+    {
+        $meetingRooms = MeetingRoom::all();
+        $occupancies = [];
+
+        foreach ($meetingRooms as $room) {
+            // Aqui você pode definir a lógica para contar as horas ocupadas
+            // Supondo que você tenha um relacionamento com a tabela meetings
+            $totalHours = Meeting::where('meeting_room_id', $room->id)
+                ->sum('duration'); // 'duration' deve ser o campo que representa as horas da reunião
+
+            $occupancies[] = [
+                'room' => $room->name, // Supondo que você tenha um campo 'name' na tabela rooms
+                'hours' => $totalHours,
+            ];
+        }
+
+        return response()->json([
+            'labels' => array_column($occupancies, 'room'),
+            'data' => array_column($occupancies, 'hours'),
+        ]);
+    }
+
     public function getOccupiedHours($roomId, $date)
     {
         $validatedDate = Carbon::createFromFormat('Y-m-d', $date);
