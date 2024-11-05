@@ -17,8 +17,8 @@
       </thead>
       <tbody>
         <tr v-for="room in rooms" :key="room.id">
-          <td>{{ room.name }}</td>
-          <td>{{ room.capacity }}</td>
+          <td>{{ room.nome }}</td>
+          <td>{{ room.capacidade }}</td>
           <td>
             <button class="btn btn-edit" @click="editRoom(room)">Editar</button>
             <button class="btn btn-delete" @click="deleteRoom(room.id)">Excluir</button>
@@ -27,39 +27,63 @@
       </tbody>
     </table>
 
-    <Modal :show="showAddRoomModal" @close="showAddRoomModal = false" title="Adicionar Nova Sala">
-      <template #default>
+    <!-- Modal de Adição de Sala -->
+    <div v-if="showAddRoomModal" class="modal-overlay">
+      <div class="modal-content">
+        <h3>Adicionar Nova Sala</h3>
         <form @submit.prevent="addRoom">
           <div class="form-group">
             <label for="roomName">Nome da Sala:</label>
-            <input type="text" id="roomName" v-model="newRoom.name" required>
+            <input type="text" id="roomName" v-model="newRoom.nome" required>
+          </div>
+          <div class="form-group">
+            <label for="roomLocation">Localização:</label>
+            <input type="text" id="roomLocation" v-model="newRoom.localizacao" required>
           </div>
           <div class="form-group">
             <label for="roomCapacity">Capacidade:</label>
-            <input type="number" id="roomCapacity" v-model="newRoom.capacity" required min="1">
+            <input type="number" id="roomCapacity" v-model="newRoom.capacidade" required min="1">
           </div>
           <div class="modal-actions">
             <button type="submit" class="btn btn-primary">Adicionar</button>
             <button type="button" class="btn btn-secondary" @click="showAddRoomModal = false">Cancelar</button>
           </div>
         </form>
-      </template>
-    </Modal>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import Modal from '../components/modal.vue'
 import AdminSidebar from '../components/AdminSidebar.vue'
 
 const rooms = ref([]) 
 const showAddRoomModal = ref(false)
-const newRoom = ref({ name: '', capacity: null })
+const newRoom = ref({ nome: '', capacidade: null, localizacao: '' })
 
-const addRoom = () => {
-  // Lógica para adicionar sala
+const addRoom = async () => {
+  try {
+    console.log("Dados enviados:", newRoom.value); // Para depurar os dados enviados
+    const response = await fetch('http://localhost:8000/api/meeting-rooms', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newRoom.value)
+    })
+    
+    if (!response.ok) throw new Error('Erro ao adicionar sala')
+
+    const data = await response.json()
+    rooms.value.push(data)
+    showAddRoomModal.value = false
+    newRoom.value = { nome: '', capacidade: null, localizacao: '' }
+  } catch (error) {
+    console.error(error)
+  }
 }
+
 
 const editRoom = (room) => {
   // Lógica para editar sala
@@ -156,5 +180,34 @@ const deleteRoom = (id) => {
 
 .btn-delete:hover {
   background-color: #dc2626;
+}
+
+/* Estilo do modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+
+.modal-content {
+  background: #ffffff;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
 }
 </style>
