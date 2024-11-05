@@ -62,11 +62,11 @@
                 <input type="text" id="cpf" class="form-control" v-model="newUser.cpf" required />
               </div>
               <div class="form-group m-3">
-                <label for="password">Email:</label>
+                <label for="password">Senha:</label>
                 <input type="password" id="password" class="form-control" v-model="newUser.password" required />
               </div>
               <div class="form-group m-3">
-                <label for="confirmation_password">Email:</label>
+                <label for="confirmation_password">Confirme sua Senha:</label>
                 <input type="password" id="confirmation_password" class="form-control" v-model="newUser.password_confirmation" required />
               </div>
               <div class="form-group m-3">
@@ -136,7 +136,7 @@ export default {
           this.users.push(response.data);
           alert("Usuário adicionado com sucesso!");
         }
-        this.fetchUsers(); // Atualiza a lista de usuários
+        this.fetchUsers(); 
         this.closeModal();
       } catch (error) {
         console.error("Erro ao salvar usuário:", error.response?.data);
@@ -155,7 +155,7 @@ export default {
       }
     },
     editUser(user) {
-      this.isEditing = true;
+      this.isEditing = true;;;
       this.newUser = { ...user };
       this.showModal = true;
     },
