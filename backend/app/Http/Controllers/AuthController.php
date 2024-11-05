@@ -74,6 +74,41 @@ class AuthController extends Controller
 
     return response()->json(['message' => 'Administrador registrado com sucesso!']);
     }
+
+    public function updateAdmin(Request $request, $id) 
+    {
+    // Validação das regras
+    $request->validate([
+        'name' => 'sometimes|required|string',
+        'email' => 'sometimes|required|string|email|unique:users,email,' . $id,
+        'cpf' => 'sometimes|required|string|max:11|unique:users,cpf,' . $id,
+        'password' => 'sometimes|required|string|min:8|confirmed|nullable',
+    ]);
+
+    // Verifica se o usuário autenticado é um administrador
+    if (auth()->check() && auth()->user()->role !== 'admin') {
+        return response()->json(['message' => 'Acesso negado. Somente administradores podem atualizar outros administradores.'], 403);
+    }
+
+    // Busca o administrador pelo ID
+    $admin = User::findOrFail($id);
+
+    // Atualiza os dados do administrador
+    $admin->name = $request->name ?? $admin->name;
+    $admin->email = $request->email ?? $admin->email;
+    $admin->cpf = $request->cpf ?? $admin->cpf;
+
+    // Se uma nova senha for fornecida, atualiza a senha
+    if ($request->filled('password')) {
+        $admin->password = Hash::make($request->password);
+    }
+
+    // Salva as alterações no banco de dados
+    $admin->save();
+
+    return response()->json(['message' => 'Administrador atualizado com sucesso!']);
+    }   
+
     
     public function update(Request $request, $id) 
     {

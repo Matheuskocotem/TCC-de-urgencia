@@ -91,7 +91,7 @@ class MeetingController extends Controller
     // Mostrar uma reunião específica
     public function show($id)
     {
-        $meeting = Meeting::with('user', 'room')->findOrFail($id); // Corrigido para 'room'
+        $meeting = Meeting::with('user', 'room')->findOrFail($id); 
         return response()->json($meeting);
     }
 
