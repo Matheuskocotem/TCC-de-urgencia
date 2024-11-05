@@ -9,35 +9,32 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::middleware(['role:user'])->group(function () {
-        Route::post('/logout', [AuthController::class, 'logout']);
-        Route::put('/update/{id}', [AuthController::class, 'update']);
-        Route::delete('/delete/{id}', [AuthController::class, 'delete']);
-        
-        Route::prefix('meeting-rooms')->group(function () {
-            Route::get('/', [MeetingRoomController::class, 'index']); 
-            Route::get('/{id}', [MeetingRoomController::class, 'show']); 
-        });
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::put('/update/{id}', [AuthController::class, 'update']);
+    Route::delete('/delete/{id}', [AuthController::class, 'delete']);
 
-        Route::prefix('meetings')->group(function () {
-            Route::get('/day/{date}', [MeetingController::class, 'getMeetingsByDay']);
-            Route::get('/', [MeetingController::class, 'index']); 
-            Route::post('/', [MeetingController::class, 'store']); 
-            Route::get('/{id}', [MeetingController::class, 'show']); 
-            Route::put('/{id}', [MeetingController::class, 'update']); 
-            Route::delete('/{id}', [MeetingController::class, 'destroy']); 
-        });
-    });
-
-    Route::middleware(['role:admin'])->group(function () {
-        Route::get('/index', [AuthController::class, 'index']);
-        Route::post('/add-admin', [AuthController::class, 'addAdmin']);
-
-        Route::prefix('meeting-rooms')->group(function () {
+    Route::prefix('meeting-rooms')->group(function () {
+        Route::get('/', [MeetingRoomController::class, 'index']); 
+        Route::get('/{id}', [MeetingRoomController::class, 'show']); 
+        Route::middleware(['role:admin'])->group(function () {
             Route::post('/', [MeetingRoomController::class, 'store']); 
             Route::get('/{roomId}/occupancies/day/{date}', [MeetingRoomController::class, 'getOccupiedHours']);
             Route::put('/{id}', [MeetingRoomController::class, 'update']); 
             Route::delete('/{id}', [MeetingRoomController::class, 'destroy']); 
         });
+    });
+
+    Route::prefix('meetings')->group(function () {
+        Route::get('/day/{date}', [MeetingController::class, 'getMeetingsByDay']);
+        Route::get('/', [MeetingController::class, 'index']); 
+        Route::post('/', [MeetingController::class, 'store']); 
+        Route::get('/{id}', [MeetingController::class, 'show']); 
+        Route::put('/{id}', [MeetingController::class, 'update']); 
+        Route::delete('/{id}', [MeetingController::class, 'destroy']); 
+    });
+
+    Route::middleware(['role:admin'])->prefix('users')->group(function () {
+        Route::get('/index', [AuthController::class, 'index']);
+        Route::post('/add-admin', [AuthController::class, 'addAdmin']);
     });
 });
