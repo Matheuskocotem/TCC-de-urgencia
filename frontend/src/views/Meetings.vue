@@ -30,8 +30,10 @@
       </tbody>
     </table>
 
-    <Modal :isOpen="showAddMeetingModal" @close="showAddMeetingModal = false" title="Adicionar Nova Reunião">
-      <template #default>
+    <!-- Modal diretamente na tela -->
+    <div v-if="showAddMeetingModal" class="modal-overlay" @click.self="showAddMeetingModal = false">
+      <div class="modal-content">
+        <h2>Adicionar Nova Reunião</h2>
         <form @submit.prevent="addMeeting">
           <div class="form-group">
             <label for="meetingTitle">Título da Reunião:</label>
@@ -50,27 +52,26 @@
             <button type="button" class="btn btn-secondary" @click="showAddMeetingModal = false">Cancelar</button>
           </div>
         </form>
-      </template>
-    </Modal>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import Modal from '../components/modal.vue';
 import AdminSidebar from '../components/AdminSidebar.vue';
 
 const upcomingMeetings = ref([]);
 const showAddMeetingModal = ref(false);
 const newMeeting = ref({ title: '', date: '', time: '' });
 
-const apiUrl = 'http://localhost:8000/api/meetings/'; // Substitua pela URL da sua API
+const apiUrl = 'http://localhost:8000/api/meetings/';
 
 const fetchMeetings = async () => {
   try {
     const response = await axios.get(apiUrl);
-    upcomingMeetings.value = response.data; // Supondo que a API retorna um array de reuniões
+    upcomingMeetings.value = response.data;
   } catch (error) {
     console.error('Erro ao buscar reuniões:', error);
   }
@@ -79,16 +80,16 @@ const fetchMeetings = async () => {
 const addMeeting = async () => {
   try {
     const meeting = {
-      room: 'Nova Sala', // Substitua conforme necessário
+      room: 'Nova Sala',
       date: newMeeting.value.date,
       time: newMeeting.value.time,
-      organizer: newMeeting.value.title, // Use o título como responsável
+      organizer: newMeeting.value.title,
     };
 
     const response = await axios.post(apiUrl, meeting);
-    upcomingMeetings.value.push(response.data); // Adiciona a nova reunião à lista
-    newMeeting.value = { title: '', date: '', time: '' }; // Limpa o formulário
-    showAddMeetingModal.value = false; // Fecha o modal
+    upcomingMeetings.value.push(response.data);
+    newMeeting.value = { title: '', date: '', time: '' };
+    showAddMeetingModal.value = false;
   } catch (error) {
     console.error('Erro ao adicionar reunião:', error);
   }
@@ -97,7 +98,9 @@ const addMeeting = async () => {
 onMounted(fetchMeetings);
 </script>
 
+
 <style scoped>
+/* Sidebar */
 .sidebar {
   position: fixed; /* Fixa a barra lateral */
   left: 0;
@@ -109,7 +112,7 @@ onMounted(fetchMeetings);
   z-index: 10; /* Coloca a sidebar acima do conteúdo */
 }
 
-
+/* Main Content */
 .meetings {
   padding: 20px;
   margin-left: 250px; /* Adiciona margem à esquerda igual à largura da sidebar */
@@ -126,6 +129,7 @@ onMounted(fetchMeetings);
   margin-bottom: 20px;
 }
 
+/* Button Styles */
 .btn {
   padding: 10px 15px;
   border: none;
@@ -162,6 +166,7 @@ onMounted(fetchMeetings);
   background-color: #dc2626;
 }
 
+/* Table Styles */
 .meetings-table {
   width: 100%;
   border-collapse: collapse;
@@ -180,16 +185,45 @@ onMounted(fetchMeetings);
   color: #333;
 }
 
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5); /* Fundo escuro translúcido */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* Coloca o modal acima de outros elementos */
+}
+
+/* Modal Content */
+.modal-content {
+  background: white;
+  padding: 20px;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra */
+  position: relative;
+  animation: fadeIn 0.3s ease; /* Animação de aparecimento */
+}
+
+/* Modal Actions */
 .modal-actions {
   margin-top: 1rem;
   display: flex;
   justify-content: space-between;
 }
 
+/* Form Group */
 .form-group {
   margin-bottom: 1rem;
 }
 
+/* Input Style */
 .form-input {
   width: 100%;
   padding: 8px;
@@ -201,5 +235,17 @@ onMounted(fetchMeetings);
   border-color: #3b82f6;
   outline: none;
   box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 </style>
