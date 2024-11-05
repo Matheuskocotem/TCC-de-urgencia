@@ -67,7 +67,7 @@
               </div>
               <div class="form-group m-3">
                 <label for="confirmation_password">Email:</label>
-                <input type="password" id="confirmation_password" class="form-control" v-model="newUser.confirmation_password" required />
+                <input type="password" id="confirmation_password" class="form-control" v-model="newUser.password_confirmation" required />
               </div>
               <div class="form-group m-3">
                 <label for="role">Função:</label>
@@ -98,7 +98,7 @@ export default {
     return {
       showModal: false,
       isEditing: false,
-      newUser: { id: null, name: "", email: "", role: "", cpf: "", password: "", confirmation_password: "",},
+      newUser: { id: null, name: "", email: "", role: "", cpf: "", password: "", password_confirmation: "",},
       users: [],
     };
   },
@@ -119,7 +119,7 @@ export default {
 
     openModal() {
       this.isEditing = false;
-      this.newUser = { id: null, name: "", email: "", role: "" };
+      this.newUser = { id: null, name: "", email: "", role: "", password: "", password_confirmation: "", cpf: ""};
       this.showModal = true;
     },
     closeModal() {
