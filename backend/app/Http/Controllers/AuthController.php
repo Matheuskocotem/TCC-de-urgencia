@@ -9,6 +9,20 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+
+    public function index(Request $request)
+    {
+    // Verifica se o usuário autenticado é um administrador
+    if (auth()->user()->role !== 'admin') {
+        return response()->json(['message' => 'Acesso negado. Apenas administradores podem visualizar todos os usuários.'], 403);
+    }
+
+    // Busca todos os usuários com informações básicas
+    $users = User::select('id', 'name', 'email', 'cpf', 'role', 'created_at')->get();
+
+    return response()->json(['users' => $users]);
+    }   
+
     public function register(Request $request) 
     {
         $request->validate([
