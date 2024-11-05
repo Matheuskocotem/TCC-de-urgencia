@@ -30,7 +30,7 @@
       </tbody>
     </table>
 
-    <Modal :show="showAddMeetingModal" @close="showAddMeetingModal = false" title="Adicionar Nova Reunião">
+    <Modal :isOpen="showAddMeetingModal" @close="showAddMeetingModal = false" title="Adicionar Nova Reunião">
       <template #default>
         <form @submit.prevent="addMeeting">
           <div class="form-group">
@@ -56,41 +56,45 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
 import Modal from '../components/modal.vue';
 import AdminSidebar from '../components/AdminSidebar.vue';
 
-const upcomingMeetings = ref([
-  { id: 1, room: 'Sala A', date: '2023-11-03', time: '09:00 - 10:00', organizer: 'João Silva' },
-  { id: 2, room: 'Sala B', date: '2023-11-03', time: '11:00 - 12:00', organizer: 'Maria Santos' },
-  { id: 3, room: 'Sala C', date: '2023-11-04', time: '14:00 - 15:00', organizer: 'Carlos Almeida' },
-]);
+const upcomingMeetings = ref([]);
 const showAddMeetingModal = ref(false);
 const newMeeting = ref({ title: '', date: '', time: '' });
 
-const addMeeting = () => {
-  const meeting = {
-    id: upcomingMeetings.value.length + 1, // ID gerado com base na quantidade de reuniões
-    room: 'Nova Sala', // Altere conforme necessário
-    date: newMeeting.value.date,
-    time: newMeeting.value.time,
-    organizer: newMeeting.value.title, // Use o título como responsável ou ajuste conforme necessário
-  };
+const apiUrl = 'http://localhost:8000/api/meetings/'; // Substitua pela URL da sua API
 
-  upcomingMeetings.value.push(meeting);
-  newMeeting.value = { title: '', date: '', time: '' }; // Limpa o formulário
-  showAddMeetingModal.value = false; // Fecha o modal após adicionar
+const fetchMeetings = async () => {
+  try {
+    const response = await axios.get(apiUrl);
+    upcomingMeetings.value = response.data; // Supondo que a API retorna um array de reuniões
+  } catch (error) {
+    console.error('Erro ao buscar reuniões:', error);
+  }
 };
 
-const editMeeting = (meeting) => {
-  // Aqui você pode implementar a lógica para editar a reunião
-  console.log('Editando reunião:', meeting);
-  // Adicione lógica para preencher os campos do modal com os dados da reunião a ser editada
+const addMeeting = async () => {
+  try {
+    const meeting = {
+      room: 'Nova Sala', // Substitua conforme necessário
+      date: newMeeting.value.date,
+      time: newMeeting.value.time,
+      organizer: newMeeting.value.title, // Use o título como responsável
+    };
+
+    const response = await axios.post(apiUrl, meeting);
+    upcomingMeetings.value.push(response.data); // Adiciona a nova reunião à lista
+    newMeeting.value = { title: '', date: '', time: '' }; // Limpa o formulário
+    showAddMeetingModal.value = false; // Fecha o modal
+  } catch (error) {
+    console.error('Erro ao adicionar reunião:', error);
+  }
 };
 
-const deleteMeeting = (id) => {
-  upcomingMeetings.value = upcomingMeetings.value.filter(meeting => meeting.id !== id);
-};
+onMounted(fetchMeetings);
 </script>
 
 <style scoped>

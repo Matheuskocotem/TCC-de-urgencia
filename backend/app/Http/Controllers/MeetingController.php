@@ -73,7 +73,7 @@ class MeetingController extends Controller
                ($startTime->between(Carbon::createFromTime(11, 30), Carbon::createFromTime(13, 0))) || 
                $startTime->isAfter(Carbon::createFromTime(17, 0));
     }
-
+    
     private function hasTimeConflict($meetingRoomId, Carbon $startTime, Carbon $endTime)
     {
         return Meeting::where('room_id', $meetingRoomId)

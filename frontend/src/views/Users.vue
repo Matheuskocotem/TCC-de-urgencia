@@ -9,7 +9,7 @@
       <div class="py-4">
         <div class="d-flex justify-content-between">
           <h4>Usuários Registrados</h4>
-          <button class="btn btn-primary" @click="showModal = true">
+          <button class="btn btn-primary" @click="openModal">
             Adicionar Usuário
           </button>
         </div>
@@ -39,18 +39,16 @@
       </div>
     </main>
 
-    <!-- Modal de Adicionar Usuário -->
-    <div class="modal fade" :class="{ show: showModal, 'd-block': showModal }" tabindex="-1" role="dialog"
-      style="background: rgba(0, 0, 0, 0.5)">
+    <!-- Modal de Adicionar/Editar Usuário -->
+    <div class="modal fade" :class="{ show: showModal, 'd-block': showModal }" tabindex="-1" role="dialog" style="background: rgba(0, 0, 0, 0.5)">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header d-flex justify-content-between">
-            <h5 class="modal-title">Adicionar Usuário</h5>
-            <button class="close btn btn-danger" @click="showModal = false">X
-            </button>
+            <h5 class="modal-title">{{ isEditing ? "Editar Usuário" : "Adicionar Usuário" }}</h5>
+            <button class="close btn btn-danger" @click="closeModal">X</button>
           </div>
           <div class="modal-body">
-            <form @submit.prevent="addUser">
+            <form @submit.prevent="saveUser">
               <div class="form-group m-3">
                 <label for="name">Nome:</label>
                 <input type="text" id="name" class="form-control" v-model="newUser.name" required />
@@ -87,7 +85,8 @@ export default {
   data() {
     return {
       showModal: false,
-      newUser: { name: "", email: "", role: "" },
+      isEditing: false,
+      newUser: { id: null, name: "", email: "", role: "" },
       users: [],
     };
   },
@@ -104,43 +103,47 @@ export default {
         alert("Erro ao carregar usuários: " + (error.response?.data?.message || "Erro desconhecido."));
       }
     },
-    async addUser() {
+    openModal() {
+      this.isEditing = false;
+      this.newUser = { id: null, name: "", email: "", role: "" };
+      this.showModal = true;
+    },
+    closeModal() {
+      this.showModal = false;
+      this.newUser = { id: null, name: "", email: "", role: "" };
+    },
+    async saveUser() {
       try {
-        const response = await axios.post('http://localhost:8000/api/users/add-admin', this.newUser);
-        this.users.push(response.data); // Adiciona o novo usuário na lista local
-        this.newUser = { name: "", email: "", role: "" }; // Limpa o formulário
-        this.showModal = false; // Fecha o modal
-        alert("Usuário adicionado com sucesso!");
+        if (this.isEditing) {
+          await axios.put(`http://localhost:8000/api/users/${this.newUser.id}`, this.newUser);
+          alert("Usuário atualizado com sucesso!");
+        } else {
+          const response = await axios.post('http://localhost:8000/api/users/add-admin', this.newUser);
+          this.users.push(response.data);
+          alert("Usuário adicionado com sucesso!");
+        }
+        this.fetchUsers(); // Atualiza a lista de usuários
+        this.closeModal();
       } catch (error) {
-        console.error("Erro ao adicionar usuário:", error.response?.data);
-        alert("Erro ao adicionar usuário: " + (error.response?.data?.message || "Erro desconhecido."));
+        console.error("Erro ao salvar usuário:", error.response?.data);
+        alert("Erro ao salvar usuário: " + (error.response?.data?.message || "Erro desconhecido."));
       }
     },
     async deleteUser(userId) {
       if (!confirm("Tem certeza que deseja excluir este usuário?")) return;
-
       try {
         await axios.delete(`http://localhost:8000/api/users/${userId}`);
-        this.users = this.users.filter(user => user.id !== userId); // Remove o usuário da lista local
+        this.users = this.users.filter(user => user.id !== userId);
         alert("Usuário excluído com sucesso!");
       } catch (error) {
         console.error("Erro ao excluir usuário:", error.response?.data);
         alert("Erro ao excluir usuário: " + (error.response?.data?.message || "Erro desconhecido."));
       }
     },
-    async editUser(user) {
-      // Aqui você pode abrir um modal ou formulário para editar o usuário
-      // e depois enviar os dados editados para a API
-      console.log("Editando usuário:", user);
-      // Exemplo de requisição para atualização (ajuste conforme necessário):
-      // try {
-      //   const response = await axios.put(`http://localhost:8000/api/users/${user.id}`, user);
-      //   this.fetchUsers(); // Atualiza a lista de usuários
-      //   alert("Usuário atualizado com sucesso!");
-      // } catch (error) {
-      //   console.error("Erro ao editar usuário:", error.response?.data);
-      //   alert("Erro ao editar usuário: " + (error.response?.data?.message || "Erro desconhecido."));
-      // }
+    editUser(user) {
+      this.isEditing = true;
+      this.newUser = { ...user };
+      this.showModal = true;
     },
   },
 };
@@ -182,6 +185,15 @@ export default {
 
 .users-table th {
   background-color: #f3f4f6;
+}
+
+/* Modal transitions */
+.modal.fade.show {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+.modal.fade {
+  opacity: 0;
 }
 
 </style>
