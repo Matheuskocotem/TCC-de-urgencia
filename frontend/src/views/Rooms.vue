@@ -20,7 +20,7 @@
           <td>{{ room.nome }}</td>
           <td>{{ room.capacidade }}</td>
           <td>
-            <button class="btn btn-edit" @click="editRoom(room)">Editar</button>
+            <button class="btn btn-edit" @click="openEditModal(room)">Editar</button>
             <button class="btn btn-delete" @click="deleteRoom(room.id)">Excluir</button>
           </td>
         </tr>
@@ -44,9 +44,74 @@
             <label for="roomCapacity">Capacidade:</label>
             <input type="number" id="roomCapacity" v-model="newRoom.capacidade" required min="1">
           </div>
+          <div class="form-group">
+            <label for="roomResources">Recursos:</label>
+            <input type="text" id="roomResources" v-model="newRoom.recursos">
+          </div>
+          <div class="form-group">
+            <label for="roomAvailability">Disponibilidade:</label>
+            <input type="text" id="roomAvailability" v-model="newRoom.disponibilidade">
+          </div>
+          <div class="form-group">
+            <label for="roomImage">Imagem:</label>
+            <input type="text" id="roomImage" v-model="newRoom.imagem">
+          </div>
+          <div class="form-group">
+            <label for="roomDescription">Descrição:</label>
+            <textarea id="roomDescription" v-model="newRoom.descricao"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="roomActive">Ativo:</label>
+            <input type="checkbox" id="roomActive" v-model="newRoom.ativo">
+          </div>
           <div class="modal-actions">
             <button type="submit" class="btn btn-primary">Adicionar</button>
             <button type="button" class="btn btn-secondary" @click="showAddRoomModal = false">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal de Edição de Sala -->
+    <div v-if="showEditRoomModal" class="modal-overlay">
+      <div class="modal-content">
+        <h3>Editar Sala</h3>
+        <form @submit.prevent="updateRoom">
+          <div class="form-group">
+            <label for="editRoomName">Nome da Sala:</label>
+            <input type="text" id="editRoomName" v-model="selectedRoom.nome" required>
+          </div>
+          <div class="form-group">
+            <label for="editRoomLocation">Localização:</label>
+            <input type="text" id="editRoomLocation" v-model="selectedRoom.localizacao" required>
+          </div>
+          <div class="form-group">
+            <label for="editRoomCapacity">Capacidade:</label>
+            <input type="number" id="editRoomCapacity" v-model="selectedRoom.capacidade" required min="1">
+          </div>
+          <div class="form-group">
+            <label for="editRoomResources">Recursos:</label>
+            <input type="text" id="editRoomResources" v-model="selectedRoom.recursos">
+          </div>
+          <div class="form-group">
+            <label for="editRoomAvailability">Disponibilidade:</label>
+            <input type="text" id="editRoomAvailability" v-model="selectedRoom.disponibilidade">
+          </div>
+          <div class="form-group">
+            <label for="editRoomImage">Imagem:</label>
+            <input type="text" id="editRoomImage" v-model="selectedRoom.imagem">
+          </div>
+          <div class="form-group">
+            <label for="editRoomDescription">Descrição:</label>
+            <textarea id="editRoomDescription" v-model="selectedRoom.descricao"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="editRoomActive">Ativo:</label>
+            <input type="checkbox" id="editRoomActive" v-model="selectedRoom.ativo">
+          </div>
+          <div class="modal-actions">
+            <button type="submit" class="btn btn-primary">Atualizar</button>
+            <button type="button" class="btn btn-secondary" @click="showEditRoomModal = false">Cancelar</button>
           </div>
         </form>
       </div>
@@ -55,40 +120,67 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import AdminSidebar from '../components/AdminSidebar.vue';
 import axios from 'axios';
 
-const rooms = ref([]) 
-const showAddRoomModal = ref(false)
-const newRoom = ref({ nome: '', capacidade: null, localizacao: '' })
+const rooms = ref([]);
+const showAddRoomModal = ref(false);
+const showEditRoomModal = ref(false);
+const newRoom = ref({ nome: '', capacidade: null, localizacao: '', recursos: '', ativo: false, disponibilidade: '', imagem: '', descricao: '' });
+const selectedRoom = ref(null);
 
 const addRoom = async () => {
   try {
-    console.log("Dados enviados:", { ...newRoom.value }) // Para depurar os dados enviados
-    const response = await axios.post('http://localhost:8000/api/meeting-rooms', {
-      nome: newRoom.value.nome,
-      localizacao: newRoom.value.localizacao,
-      capacidade: newRoom.value.capacidade
-    })
-
-    rooms.value.push(response.data)
-    showAddRoomModal.value = false
-    newRoom.value = { nome: '', capacidade: null, localizacao: '' }
+    const response = await axios.post('http://localhost:8000/api/meeting-rooms', { ...newRoom.value });
+    rooms.value.push(response.data);
+    showAddRoomModal.value = false;
+    resetRoomData(newRoom);
   } catch (error) {
-    console.error("Erro ao adicionar sala:", error)
+    console.error("Erro ao adicionar sala:", error);
   }
-}
+};
 
+const openEditModal = (room) => {
+  selectedRoom.value = { ...room };
+  showEditRoomModal.value = true;
+};
 
-const editRoom = (room) => {
-  // Lógica para editar sala
-}
+const updateRoom = async () => {
+  try {
+    await axios.put(`http://localhost:8000/api/meeting-rooms/${selectedRoom.value.id}`, { ...selectedRoom.value });
+    const index = rooms.value.findIndex((r) => r.id === selectedRoom.value.id);
+    if (index !== -1) rooms.value[index] = { ...selectedRoom.value };
+    showEditRoomModal.value = false;
+  } catch (error) {
+    console.error("Erro ao atualizar sala:", error);
+  }
+};
 
-const deleteRoom = (id) => {
-  // Lógica para excluir sala
-}
+const deleteRoom = async (id) => {
+  try {
+    await axios.delete(`http://localhost:8000/api/meeting-rooms/${id}`);
+    rooms.value = rooms.value.filter((room) => room.id !== id);
+  } catch (error) {
+    console.error("Erro ao excluir sala:", error);
+  }
+};
+
+const resetRoomData = (room) => {
+  room.value = { nome: '', capacidade: null, localizacao: '', recursos: '', ativo: false, disponibilidade: '', imagem: '', descricao: '' };
+};
+
+onMounted(async () => {
+  try {
+    const response = await axios.get('http://localhost:8000/api/meeting-rooms');
+    rooms.value = response.data;
+  } catch (error) {
+    console.error("Erro ao carregar salas:", error);
+  }
+});
 </script>
+
+
 
 <style scoped>
 /* Estilo da Sidebar */
