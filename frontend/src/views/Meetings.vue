@@ -10,7 +10,7 @@
       <thead>
         <tr>
           <th>Sala</th>
-          <th>Data</th>
+          <th>Titulo</th>
           <th>Horário</th>
           <th>Responsável</th>
           <th>Ações</th>
@@ -19,7 +19,7 @@
       <tbody>
         <tr v-for="meeting in upcomingMeetings" :key="meeting.id">
           <td>{{ meeting.room }}</td>
-          <td>{{ meeting.date }}</td>
+          <td>{{ meeting.title }}</td>
           <td>{{ meeting.time }}</td>
           <td>{{ meeting.organizer }}</td>
           <td>
@@ -126,14 +126,15 @@ const addMeeting = async () => {
       user_id: newMeeting.value.user_id,
       title: newMeeting.value.title,
       description: newMeeting.value.description,
-      date: newMeeting.value.date,
+      // Certifique-se que a data está no formato correto
+      date: new Date(newMeeting.value.date).toISOString().split('T')[0], 
       start_time: newMeeting.value.start_time,
       end_time: newMeeting.value.end_time,
       status: newMeeting.value.status,
     };
 
     const response = await axios.post(apiUrl, meeting);
-    // Adiciona a nova reunião à lista de reuniões, com o formato correto
+
     upcomingMeetings.value.push({
       ...response.data,
       date: response.data.date,
@@ -141,8 +142,7 @@ const addMeeting = async () => {
       organizer: response.data.user_id,
       room: response.data.room_id
     });
-    
-    // Resetando o formulário
+
     newMeeting.value = {
       room_id: '',
       user_id: '',
@@ -153,11 +153,13 @@ const addMeeting = async () => {
       end_time: '',
       status: '0',
     };
+
     showAddMeetingModal.value = false;
   } catch (error) {
     console.error('Erro ao adicionar reunião:', error);
   }
 };
+
 
 
 
