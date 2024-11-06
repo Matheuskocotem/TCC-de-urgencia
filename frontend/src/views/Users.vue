@@ -17,14 +17,14 @@
           <thead>
             <tr>
               <th>Nome</th>
-              <th>Email</th>
+              <th>CPF</th>
               <th>Ações</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="user in users" :key="user.id">
               <td>{{ user.name }}</td>
-              <td>{{ user.email }}</td>
+              <td>{{ user.cpf }}</td>
               <td>
                 <button class="btn btn-edit btn-secondary mx-1" @click="editUser(user)">
                   Editar
@@ -58,6 +58,18 @@
                 <input type="email" id="email" class="form-control" v-model="newUser.email" required />
               </div>
               <div class="form-group m-3">
+                <label for="cpf">CPF:</label>
+                <input type="text" id="cpf" class="form-control" v-model="newUser.cpf" required />
+              </div>
+              <div class="form-group m-3">
+                <label for="password">Senha:</label>
+                <input type="password" id="password" class="form-control" v-model="newUser.password" required />
+              </div>
+              <div class="form-group m-3">
+                <label for="confirmation_password">Confirme sua Senha:</label>
+                <input type="password" id="confirmation_password" class="form-control" v-model="newUser.password_confirmation" required />
+              </div>
+              <div class="form-group m-3">
                 <label for="role">Função:</label>
                 <select id="role" class="form-control" v-model="newUser.role" required>
                   <option value="" disabled>Selecione uma função</option>
@@ -86,7 +98,7 @@ export default {
     return {
       showModal: false,
       isEditing: false,
-      newUser: { id: null, name: "", email: "", role: "" },
+      newUser: { id: null, name: "", email: "", role: "", cpf: "", password: "", password_confirmation: "",},
       users: [],
     };
   },
@@ -97,15 +109,17 @@ export default {
     async fetchUsers() {
       try {
         const response = await axios.get('http://localhost:8000/api/users/index');
-        this.users = response.data;
+        this.users = response.data.users;
       } catch (error) {
         console.error("Erro ao buscar usuários:", error.response ? error.response.data : error.message);
         alert("Erro ao carregar usuários: " + (error.response?.data?.message || "Erro desconhecido."));
       }
     },
+
+
     openModal() {
       this.isEditing = false;
-      this.newUser = { id: null, name: "", email: "", role: "" };
+      this.newUser = { id: null, name: "", email: "", role: "", password: "", password_confirmation: "", cpf: ""};
       this.showModal = true;
     },
     closeModal() {
@@ -115,14 +129,14 @@ export default {
     async saveUser() {
       try {
         if (this.isEditing) {
-          await axios.put(`http://localhost:8000/api/users/${this.newUser.id}`, this.newUser);
+          await axios.put(`http://localhost:8000/api/users/updateAdmin/${this.newUser.id}`, this.newUser);
           alert("Usuário atualizado com sucesso!");
         } else {
           const response = await axios.post('http://localhost:8000/api/users/add-admin', this.newUser);
           this.users.push(response.data);
           alert("Usuário adicionado com sucesso!");
         }
-        this.fetchUsers(); // Atualiza a lista de usuários
+        this.fetchUsers(); 
         this.closeModal();
       } catch (error) {
         console.error("Erro ao salvar usuário:", error.response?.data);
@@ -132,7 +146,7 @@ export default {
     async deleteUser(userId) {
       if (!confirm("Tem certeza que deseja excluir este usuário?")) return;
       try {
-        await axios.delete(`http://localhost:8000/api/users/${userId}`);
+        await axios.delete(`http://localhost:8000/api/delete/${userId}`);
         this.users = this.users.filter(user => user.id !== userId);
         alert("Usuário excluído com sucesso!");
       } catch (error) {
@@ -141,7 +155,7 @@ export default {
       }
     },
     editUser(user) {
-      this.isEditing = true;
+      this.isEditing = true;;;
       this.newUser = { ...user };
       this.showModal = true;
     },

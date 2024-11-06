@@ -43,18 +43,40 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import axios from "axios";
 import RoomOccupancyChart from "../components/RoomOccupancyChart.vue";
 import ReservationsPerDayChart from "../components/ReservationsPerDayChart.vue";
 import AdminSidebar from "../components/AdminSidebar.vue";
-import MeetingCalendar from "../components/MeetingCalendar.vue"; // Importando o componente do calendário
+import MeetingCalendar from "../components/MeetingCalendar.vue";
 
 const summaryCards = ref([
-  { title: "Total de Reservas", value: "156", icon: "fas fa-calendar" },
-  { title: "Salas Disponíveis", value: "8", icon: "fas fa-th" },
-  { title: "Usuários Ativos", value: "42", icon: "fas fa-users" },
+  { title: "Total de Reservas", value: "Carregando...", icon: "fas fa-calendar" },
+  { title: "Salas Disponíveis", value: "Carregando...", icon: "fas fa-th" },
+  { title: "Usuários", value: "Carregando...", icon: "fas fa-users" }, // Ajustado para "Usuários"
 ]);
+
+async function fetchSummaryData() {
+  try {
+    const response = await axios.get("/users/summary-data");
+
+    const data = response.data;
+
+    summaryCards.value = [
+      { title: "Total de Reservas", value: data.totalReservas, icon: "fas fa-calendar" },
+      { title: "Salas Disponíveis", value: data.salasDisponiveis, icon: "fas fa-th" },
+      { title: "Usuários", value: data.totalUsuarios, icon: "fas fa-users" }, // Substituído para usar totalUsuarios
+    ];
+  } catch (error) {
+    console.error("Erro ao buscar dados do resumo:", error);
+  }
+}
+
+onMounted(fetchSummaryData);
 </script>
+
+
+
 
 <style scoped>
 .sidebar {

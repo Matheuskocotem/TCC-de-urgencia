@@ -11,8 +11,8 @@
         <div v-for="reuniao in reunioes" :key="reuniao.id" class="reuniao-card">
           <div class="reuniao-info">
             <h3>{{ reuniao.title }}</h3>
-            <p><strong>Sala:</strong> {{ reuniao.room.name }}</p>
-            <p><strong>Data e Hora:</strong> {{ new Date(reuniao.time).toLocaleString() }}</p>
+            <p><strong>Sala:</strong> {{ reuniao.room.nome }}</p>
+            <p><strong>Data e Hora:</strong> {{ new Date(reuniao.start_time).toLocaleString() }}</p>
           </div>
         </div>
       </div>
@@ -26,22 +26,34 @@
 </template>
 
 <script>
-import SideBar from '../components/Sidebar.vue'; 
+import axios from 'axios';
+import SideBar from '../components/Sidebar.vue';
+
 export default {
   components: {
     SideBar,
   },
   data() {
     return {
-      reunioes: [
-        { id: 1, title: "Reunião de Planejamento", room: { name: "Sala de Reuniões" }, time: "2024-10-20T10:00:00" },
-        { id: 2, title: "Reunião de Equipe", room: { name: "Sala de Conferências" }, time: "2024-10-21T14:00:00" },
-        { id: 3, title: "Reunião Executiva", room: { name: "Sala de Diretoria" }, time: "2024-10-22T09:00:00" },
-      ],
+      reunioes: [], // Inicializa o array vazio
     };
+  },
+  created() {
+    this.fetchMeetings(); // Chama a função para buscar as reuniões quando o componente for criado
+  },
+  methods: {
+    async fetchMeetings() {
+      try {
+        const response = await axios.get('http://localhost:8000/api/meetings');
+        this.reunioes = response.data; // Atribui os dados da resposta à variável reunioes
+      } catch (error) {
+        console.error('Erro ao buscar reuniões:', error);
+      }
+    },
   },
 };
 </script>
+
 
 <style scoped>
 .visualizar-reunioes {

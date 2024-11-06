@@ -57,8 +57,9 @@ class MeetingController extends Controller
             'room_id' => 'required|exists:meeting_rooms,id',
             'title' => 'required|string',
             'description' => 'nullable|string',
-            'start_time' => 'required|date',
-            'end_time' => 'required|date|after:start_time',
+            'date' => 'required|date',  // Validação para o campo date
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i|after:start_time',
         ]);
     }
 

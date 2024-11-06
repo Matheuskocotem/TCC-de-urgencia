@@ -51,7 +51,7 @@ const routes = [
     name: 'VizualiazarReunioes',
     component: () => import('../views/reunioes.vue'),
     meta: {
-      title: 'caleendario',
+      title: 'calendario',
       requiresAuth: true,
       role: 'user',
     },
