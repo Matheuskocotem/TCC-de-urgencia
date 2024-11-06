@@ -10,14 +10,7 @@ class Meeting extends Model
     use HasFactory;
 
     // Defina os atributos que podem ser atribuídos em massa
-    protected $fillable = [
-        'room_id',
-        'user_id',
-        'title',
-        'description',
-        'start_time',
-        'end_time',
-    ];
+    protected $fillable = ['room_id', 'user_id', 'title', 'description', 'date', 'start_time', 'end_time', 'status'];
 
     /**
      * Relacionamento com a tabela de users
