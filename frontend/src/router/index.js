@@ -10,6 +10,25 @@ const routes = [
     },
   },
   {
+    path: '/resetPassword/:token',
+    name: 'resetPassword',
+    component: () => import('../views/ResetPassword.vue'),
+    props: route => ({
+      token: route.query.token,
+      email: route.query.email
+    }),
+  },
+
+  {
+    path: '/forgot-password',
+    name: 'forgot-password',
+    component: () => import('../views/ForgotPassword.vue'),
+    meta: {
+      title: 'esqueci minha senha',
+    },
+  },
+
+  {
     path: '/register',
     name: 'register',
     component: () => import('../views/Register.vue'),
@@ -115,15 +134,15 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   document.title = to.meta.title;
 
-  const isAuthenticated = !!localStorage.getItem('token');
-  const userRole = localStorage.getItem('role'); 
+  const isAuthenticated = localStorage.getItem('token');
+  const userRole = localStorage.getItem('role');
 
   if (to.meta.requiresAuth) {
     if (!isAuthenticated) {
       next({ name: 'login' });
     } else {
-      if (to.meta.role && (to.meta.role !== userRole && userRole !== 'admin')) {
-        next({ name: 'BadRequest' }); 
+      if (to.meta.role && to.meta.role !== userRole) {
+        next({ name: 'BadRequest' });
       } else {
         next();
       }

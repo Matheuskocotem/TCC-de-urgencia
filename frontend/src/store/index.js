@@ -1,10 +1,8 @@
 import { createStore } from 'vuex';
-import axios from 'axios'; // Importando axios
+import axios from 'axios'; 
 
-// Configurar a URL base do Axios, se necessário
 axios.defaults.baseURL = 'http://localhost:8000/api';
 
-// Adicionar o interceptor para incluir o token em todas as requisições
 axios.interceptors.request.use(
   config => {
     const token = localStorage.getItem('token');
@@ -44,9 +42,9 @@ const store = createStore({
 
         commit('setToken', response.data.token);
         commit('setRole', response.data.role);
-        return response.data; // Retorne os dados para uso no componente
+        return response.data; 
       } catch (error) {
-        throw error; // Lançar o erro para ser tratado no componente
+        throw error; 
       }
     },
   },
