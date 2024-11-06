@@ -11,8 +11,8 @@ foreach (range(1, 200) as $index) {
         'name' => $faker->name,
         'email' => $faker->unique()->safeEmail,
         'cpf' => $faker->cpf,
-        'password' => Hash::make('password123'), // Use a senha padrão ou gere uma senha aleatória
-        'role' => 'user', // Atribuindo o role 'user'
+        'password' => Hash::make('password123'), 
+        'role' => 'user', 
         'created_at' => now(),
         'updated_at' => now(),
     ]);
