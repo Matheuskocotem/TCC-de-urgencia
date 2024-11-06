@@ -10,7 +10,7 @@
       <thead>
         <tr>
           <th>Sala</th>
-          <th>Data</th>
+          <th>Titulo</th>
           <th>Horário</th>
           <th>Responsável</th>
           <th>Ações</th>
@@ -19,7 +19,7 @@
       <tbody>
         <tr v-for="meeting in upcomingMeetings" :key="meeting.id">
           <td>{{ meeting.room }}</td>
-          <td>{{ meeting.date }}</td>
+          <td>{{ meeting.title }}</td>
           <td>{{ meeting.time }}</td>
           <td>{{ meeting.organizer }}</td>
           <td>
@@ -36,17 +36,42 @@
         <h2>Adicionar Nova Reunião</h2>
         <form @submit.prevent="addMeeting">
           <div class="form-group">
+            <label for="meetingRoom">Sala:</label>
+            <input type="number" id="meetingRoom" v-model="newMeeting.room_id" required class="form-input">
+          </div>
+          <div class="form-group">
+            <label for="meetingUser">Responsável (ID do usuário):</label>
+            <input type="number" id="meetingUser" v-model="newMeeting.user_id" required class="form-input">
+          </div>
+          <div class="form-group">
             <label for="meetingTitle">Título da Reunião:</label>
             <input type="text" id="meetingTitle" v-model="newMeeting.title" required class="form-input">
+          </div>
+          <div class="form-group">
+            <label for="meetingDescription">Descrição:</label>
+            <textarea id="meetingDescription" v-model="newMeeting.description" class="form-input"></textarea>
           </div>
           <div class="form-group">
             <label for="meetingDate">Data:</label>
             <input type="date" id="meetingDate" v-model="newMeeting.date" required class="form-input">
           </div>
           <div class="form-group">
-            <label for="meetingTime">Hora:</label>
-            <input type="time" id="meetingTime" v-model="newMeeting.time" required class="form-input">
+            <label for="meetingStartTime">Horário de Início:</label>
+            <input type="time" id="meetingStartTime" v-model="newMeeting.start_time" required class="form-input">
           </div>
+          <div class="form-group">
+            <label for="meetingEndTime">Horário de Término:</label>
+            <input type="time" id="meetingEndTime" v-model="newMeeting.end_time" required class="form-input">
+          </div>
+          <div class="form-group">
+            <label for="meetingStatus">Status:</label>
+            <select id="meetingStatus" v-model="newMeeting.status" required class="form-input">
+              <option value="0">Pendente</option>
+              <option value="1">Confirmada</option>
+              <option value="2">Cancelada</option>
+            </select>
+          </div>
+
           <div class="modal-actions">
             <button type="submit" class="btn btn-primary">Adicionar</button>
             <button type="button" class="btn btn-secondary" @click="showAddMeetingModal = false">Cancelar</button>
@@ -64,36 +89,79 @@ import AdminSidebar from '../components/AdminSidebar.vue';
 
 const upcomingMeetings = ref([]);
 const showAddMeetingModal = ref(false);
-const newMeeting = ref({ title: '', date: '', time: '' });
+const newMeeting = ref({
+  room_id: '',
+  user_id: '',
+  title: '',
+  description: '',
+  date: '',
+  start_time: '',
+  end_time: '',
+  status: '0',
+});
 
 const apiUrl = 'http://localhost:8000/api/meetings/';
 
 const fetchMeetings = async () => {
   try {
     const response = await axios.get(apiUrl);
-    upcomingMeetings.value = response.data;
+    // Mapeia as reuniões para incluir um formato legível para o horário
+    upcomingMeetings.value = response.data.map(meeting => ({
+      ...meeting,
+      date: meeting.date, // Exibe a data
+      time: `${meeting.start_time} - ${meeting.end_time}`, // Combina start_time e end_time em uma string para exibição
+      organizer: meeting.user_id, // Assume que o user_id representa o organizador (ajuste conforme necessário)
+      room: meeting.room_id
+    }));
   } catch (error) {
     console.error('Erro ao buscar reuniões:', error);
   }
 };
 
+
 const addMeeting = async () => {
   try {
     const meeting = {
-      room: 'Nova Sala',
-      date: newMeeting.value.date,
-      time: newMeeting.value.time,
-      organizer: newMeeting.value.title,
+      room_id: newMeeting.value.room_id,
+      user_id: newMeeting.value.user_id,
+      title: newMeeting.value.title,
+      description: newMeeting.value.description,
+      // Certifique-se que a data está no formato correto
+      date: new Date(newMeeting.value.date).toISOString().split('T')[0], 
+      start_time: newMeeting.value.start_time,
+      end_time: newMeeting.value.end_time,
+      status: newMeeting.value.status,
     };
 
     const response = await axios.post(apiUrl, meeting);
-    upcomingMeetings.value.push(response.data);
-    newMeeting.value = { title: '', date: '', time: '' };
+
+    upcomingMeetings.value.push({
+      ...response.data,
+      date: response.data.date,
+      time: `${response.data.start_time} - ${response.data.end_time}`,
+      organizer: response.data.user_id,
+      room: response.data.room_id
+    });
+
+    newMeeting.value = {
+      room_id: '',
+      user_id: '',
+      title: '',
+      description: '',
+      date: '',
+      start_time: '',
+      end_time: '',
+      status: '0',
+    };
+
     showAddMeetingModal.value = false;
   } catch (error) {
     console.error('Erro ao adicionar reunião:', error);
   }
 };
+
+
+
 
 onMounted(fetchMeetings);
 </script>
@@ -102,25 +170,34 @@ onMounted(fetchMeetings);
 <style scoped>
 /* Sidebar */
 .sidebar {
-  position: fixed; /* Fixa a barra lateral */
+  position: fixed;
+  /* Fixa a barra lateral */
   left: 0;
   top: 0;
-  height: 100vh; /* Altura total da tela */
-  width: 250px; /* Largura da sidebar */
-  background-color: #ffffff; /* Cor de fundo da sidebar */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra suave */
-  z-index: 10; /* Coloca a sidebar acima do conteúdo */
+  height: 100vh;
+  /* Altura total da tela */
+  width: 250px;
+  /* Largura da sidebar */
+  background-color: #ffffff;
+  /* Cor de fundo da sidebar */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  /* Sombra suave */
+  z-index: 10;
+  /* Coloca a sidebar acima do conteúdo */
 }
 
 /* Main Content */
 .meetings {
   padding: 20px;
-  margin-left: 250px; /* Adiciona margem à esquerda igual à largura da sidebar */
+  margin-left: 250px;
+  /* Adiciona margem à esquerda igual à largura da sidebar */
   background-color: #f9f9f9;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  height: 100vh; /* Garante que a altura do container seja 100% da viewport */
-  overflow-y: auto; /* Permite rolagem se o conteúdo for maior que a tela */
+  height: 100vh;
+  /* Garante que a altura do container seja 100% da viewport */
+  overflow-y: auto;
+  /* Permite rolagem se o conteúdo for maior que a tela */
 }
 
 .meetings-title {
@@ -136,7 +213,8 @@ onMounted(fetchMeetings);
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s;
-  margin-right: 10px; /* Adiciona espaço entre os botões */
+  margin-right: 10px;
+  /* Adiciona espaço entre os botões */
 }
 
 .btn-primary {
@@ -192,11 +270,13 @@ onMounted(fetchMeetings);
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.5); /* Fundo escuro translúcido */
+  background: rgba(0, 0, 0, 0.5);
+  /* Fundo escuro translúcido */
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000; /* Coloca o modal acima de outros elementos */
+  z-index: 1000;
+  /* Coloca o modal acima de outros elementos */
 }
 
 /* Modal Content */
@@ -206,9 +286,11 @@ onMounted(fetchMeetings);
   width: 90%;
   max-width: 500px;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  /* Sombra */
   position: relative;
-  animation: fadeIn 0.3s ease; /* Animação de aparecimento */
+  animation: fadeIn 0.3s ease;
+  /* Animação de aparecimento */
 }
 
 /* Modal Actions */
@@ -243,6 +325,7 @@ onMounted(fetchMeetings);
     opacity: 0;
     transform: scale(0.9);
   }
+
   to {
     opacity: 1;
     transform: scale(1);

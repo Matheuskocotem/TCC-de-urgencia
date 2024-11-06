@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->string('title');
             $table->text('description')->nullable();
             $table->dateTime('start_time');
+            $table->date('date');
             $table->dateTime('end_time');
             $table->index('start_time');
             $table->index('end_time');
