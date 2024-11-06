@@ -9,26 +9,21 @@ use Carbon\Carbon;
 
 class MeetingController extends Controller
 {
-    // Listar todas as reuniões
     public function index()
     {
-        $meetings = Meeting::with('user', 'room')->get(); // Corrigido para 'room' para manter consistência com o modelo
+        $meetings = Meeting::with('user', 'room')->get();
         return response()->json($meetings);
     }
 
     public function getMeetingsByDay($date)
     {
-        // Valida a data recebida
         $validatedDate = Carbon::createFromFormat('Y-m-d', $date);
         
-        // Busca as reuniões para a data especificada
         $meetings = Meeting::whereDate('meeting_date', $validatedDate)->get();
 
         return response()->json($meetings);
     }
 
-
-    // Criar uma nova reunião
     public function store(Request $request)
     {
         $this->validateRequest($request);
@@ -88,14 +83,12 @@ class MeetingController extends Controller
                       ->exists();
     }
 
-    // Mostrar uma reunião específica
     public function show($id)
     {
         $meeting = Meeting::with('user', 'room')->findOrFail($id); 
         return response()->json($meeting);
     }
 
-    // Atualizar uma reunião específica
     public function update(Request $request, $id)
     {
         $meeting = Meeting::findOrFail($id);
@@ -104,7 +97,6 @@ class MeetingController extends Controller
 
         $this->validateRequest($request);
 
-        // Verifica se o horário está dentro do expediente e se há conflitos
         $startTime = Carbon::parse($request->start_time);
         $endTime = Carbon::parse($request->end_time);
         
@@ -120,7 +112,6 @@ class MeetingController extends Controller
         return response()->json($meeting);
     }
 
-    // Deletar uma reunião específica
     public function destroy($id)
     {
         $meeting = Meeting::findOrFail($id);

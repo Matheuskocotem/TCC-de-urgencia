@@ -9,7 +9,7 @@ class Meeting extends Model
 {
     use HasFactory;
 
-    // Defina os atributos que podem ser atribuídos em massa
+
     protected $fillable = [
         'room_id',
         'user_id',
@@ -18,18 +18,11 @@ class Meeting extends Model
         'start_time',
         'end_time',
     ];
-
-    /**
-     * Relacionamento com a tabela de users
-     */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Relacionamento com a tabela de meeting_rooms
-     */
     public function room()
     {
         return $this->belongsTo(MeetingRoom::class);

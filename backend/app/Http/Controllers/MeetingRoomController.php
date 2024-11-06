@@ -26,9 +26,6 @@ class MeetingRoomController extends Controller
         return response()->json($occupiedMeetings);
     }
 
-    /**
-     * Armazena uma nova sala de reunião.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -44,18 +41,13 @@ class MeetingRoomController extends Controller
         return response()->json($room, Response::HTTP_CREATED); 
     }
 
-    /**
-     * Exibe a sala de reunião especificada.
-     */
+
     public function show($id)
     {
         $room = MeetingRoom::findOrFail($id);
         return response()->json($room); 
     }
 
-    /**
-     * Atualiza a sala de reunião especificada.
-     */
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -72,9 +64,7 @@ class MeetingRoomController extends Controller
         return response()->json($room); 
     }
 
-    /**
-     * Remove a sala de reunião especificada.
-     */
+
     public function destroy($id)
     {
         $room = MeetingRoom::findOrFail($id); 
