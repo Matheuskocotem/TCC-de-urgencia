@@ -20,8 +20,8 @@
           <h4 class="slots-title">Horários Disponíveis:</h4>
           <div class="slot-list">
             <span
-              v-for="slot in room.availableSlots"
-              :key="slot"
+              v-for="(slot, index) in room.availableSlots"
+              :key="index"
               class="slot"
             >
               {{ slot }}
@@ -56,12 +56,13 @@ const fetchRooms = async () => {
     const response = await api.get('/meeting-rooms/')
     rooms.value = response.data.map(room => ({
       ...room,
-      availableSlots: room.disponibilidade,  // Mapeando disponibilidade para availableSlots
+      availableSlots: room.disponibilidade,  // Atribuindo diretamente o array de horários
     }))
   } catch (error) {
     console.error('Erro ao buscar salas:', error.response?.data || error.message)
   }
 }
+
 
 // Chamando fetchRooms ao montar o componente
 onMounted(fetchRooms)
