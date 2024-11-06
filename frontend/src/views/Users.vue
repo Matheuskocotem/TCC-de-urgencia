@@ -129,7 +129,7 @@ export default {
     async saveUser() {
       try {
         if (this.isEditing) {
-          await axios.put(`http://localhost:8000/api/users/${this.newUser.id}`, this.newUser);
+          await axios.put(`http://localhost:8000/api/users/updateAdmin/${this.newUser.id}`, this.newUser);
           alert("Usuário atualizado com sucesso!");
         } else {
           const response = await axios.post('http://localhost:8000/api/users/add-admin', this.newUser);
@@ -146,7 +146,7 @@ export default {
     async deleteUser(userId) {
       if (!confirm("Tem certeza que deseja excluir este usuário?")) return;
       try {
-        await axios.delete(`http://localhost:8000/api/users/${userId}`);
+        await axios.delete(`http://localhost:8000/api/delete/${userId}`);
         this.users = this.users.filter(user => user.id !== userId);
         alert("Usuário excluído com sucesso!");
       } catch (error) {
