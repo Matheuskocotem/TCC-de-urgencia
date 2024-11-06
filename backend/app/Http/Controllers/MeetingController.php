@@ -12,7 +12,7 @@ class MeetingController extends Controller
     // Listar todas as reuniões
     public function index()
     {
-        $meetings = Meeting::with('user', 'room')->get(); // Corrigido para 'room' para manter consistência com o modelo
+        $meetings = Meeting::with('user', 'room')->get(); 
         return response()->json($meetings);
     }
 
@@ -32,18 +32,22 @@ class MeetingController extends Controller
     public function store(Request $request)
     {
         $this->validateRequest($request);
-
+    
+        // Parse do horário de início e fim
         $startTime = Carbon::parse($request->start_time);
         $endTime = Carbon::parse($request->end_time);
-
-        if ($this->isOutsideWorkHours($startTime)) {
-            return response()->json(['error' => true, 'message' => 'Não é possível agendar reuniões fora do horário de trabalho.'], 400);
+    
+        // Verifica se o horário de início está dentro do intervalo de trabalho (08:00 - 17:00)
+        if (!$this->isWithinWorkingHours($startTime)) {
+            return response()->json(['error' => true, 'message' => 'As reuniões só podem ser agendadas entre 08:00 e 17:00.'], 400);
         }
-
+    
+        // Verifica conflito de horários
         if ($this->hasTimeConflict($request->room_id, $startTime, $endTime)) {
             return response()->json(['error' => true, 'message' => 'Conflito de horário com outra reunião.'], 409); 
         }
-
+    
+        // Criação da reunião
         $meeting = Meeting::create([
             'user_id' => Auth::id(),
             'room_id' => $request->room_id,
@@ -52,10 +56,10 @@ class MeetingController extends Controller
             'start_time' => $startTime,
             'end_time' => $endTime,
         ]);
-
+    
         return response()->json($meeting, 201);
     }
-
+    
     private function validateRequest(Request $request)
     {
         $request->validate([
@@ -66,16 +70,16 @@ class MeetingController extends Controller
             'end_time' => 'required|date|after:start_time',
         ]);
     }
-
-    private function isOutsideWorkHours(Carbon $startTime)
+    
+    private function isWithinWorkingHours(Carbon $startTime)
     {
-        return $startTime->isBefore(Carbon::createFromTime(8, 0)) || 
-               ($startTime->between(Carbon::createFromTime(11, 30), Carbon::createFromTime(13, 0))) || 
-               $startTime->isAfter(Carbon::createFromTime(17, 0));
+        // Verifica se o horário está dentro do intervalo de trabalho das 08:00 às 17:00
+        return $startTime->hour >= 8 && $startTime->hour < 17;
     }
     
     private function hasTimeConflict($meetingRoomId, Carbon $startTime, Carbon $endTime)
     {
+        // Verifica se há conflito de horários para a mesma sala
         return Meeting::where('room_id', $meetingRoomId)
                       ->where(function ($query) use ($startTime, $endTime) {
                           $query->whereBetween('start_time', [$startTime, $endTime])
@@ -87,6 +91,7 @@ class MeetingController extends Controller
                       })
                       ->exists();
     }
+    
 
     // Mostrar uma reunião específica
     public function show($id)
