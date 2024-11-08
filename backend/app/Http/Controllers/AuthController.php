@@ -14,20 +14,16 @@ class AuthController extends Controller
 
     public function getSummaryData()
     {
-        // Contagem total de reuniões
         $totalReservas = Meeting::count();
     
-        // Contagem total de salas de reunião
         $salasDisponiveis = MeetingRoom::count();
+
+        $totalUsuarios = User::count(); 
     
-        // Contagem total de usuários
-        $totalUsuarios = User::count(); // Conta todos os usuários
-    
-        // Retornar os dados em uma única resposta JSON
         return response()->json([
             'totalReservas' => $totalReservas,
             'salasDisponiveis' => $salasDisponiveis,
-            'totalUsuarios' => $totalUsuarios, // Renomeado para totalUsuarios
+            'totalUsuarios' => $totalUsuarios, 
         ]);
     }
     
