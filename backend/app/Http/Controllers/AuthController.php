@@ -2,235 +2,63 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
-use App\Models\Meeting;
-use App\Models\MeetingRoom;
+use App\Http\Requests\RegisterUserRequest;
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\ForgotPasswordRequest;
+use App\Http\Requests\ResetPasswordRequest;
+use App\Http\Requests\DeleteUserRequest;
+use App\Http\Requests\UpdateUserRequest;
+use App\Services\UserService;
+use Illuminate\Http\JsonResponse;
 
 class AuthController extends Controller
 {
+    protected $userService;
 
-    public function getSummaryData()
+    public function __construct(UserService $userService)
     {
-        $totalReservas = Meeting::count();
-    
-        $salasDisponiveis = MeetingRoom::count();
-
-        $totalUsuarios = User::count(); 
-    
-        return response()->json([
-            'totalReservas' => $totalReservas,
-            'salasDisponiveis' => $salasDisponiveis,
-            'totalUsuarios' => $totalUsuarios, 
-        ]);
-    }
-    
-
-    public function index(Request $request)
-    {
-
-    if (auth()->user()->role !== 'admin') {
-        return response()->json(['message' => 'Acesso negado. Apenas administradores podem visualizar todos os usuários.'], 403);
+        $this->userService = $userService;
     }
 
-    $users = User::select('id', 'name', 'email', 'cpf', 'role', 'created_at')->get();
-
-    return response()->json(['users' => $users]);
-    }   
-
-    public function register(Request $request) 
+    public function register(RegisterUserRequest $request): JsonResponse
     {
-        $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|string|email|unique:users',
-            'cpf' => 'required|string|max:11|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-    
-        $role = $request->input('role', 'user');
-    
-        if (auth()->check() && auth()->user()->role === 'admin') {
-            $role = $request->input('role', 'user');
-        } else {
-            $role = 'user';
+        $user = $this->userService->registerUser($request->validated());
+        return response()->json(['user' => $user, 'message' => 'User registered successfully'], 201);
+    }
+
+    public function login(LoginRequest $request): JsonResponse
+    {
+        $token = $this->userService->loginUser($request->cpf, $request->password);
+        if (!$token) {
+            return response()->json(['message' => 'Invalid credentials'], 401);
         }
-    
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'cpf' => $request->cpf,
-            'password' => Hash::make($request->password),
-            'role' => $role,
-        ]);
-    
-        return response()->json(['message' => 'Usuário registrado com sucesso!']);
+        return response()->json(['token' => $token], 200);
     }
 
-    public function addAdmin(Request $request) 
+    public function update(UpdateUserRequest $request, $id): JsonResponse
     {
-    $request->validate([
-        'name' => 'required|string',
-        'email' => 'required|string|email|unique:users',
-        'cpf' => 'required|string|max:11|unique:users',
-        'password' => 'required|string|min:8|confirmed',
-    ]);
-
-    if (auth()->check() && auth()->user()->role !== 'admin') {
-        return response()->json(['message' => 'Acesso negado. Somente administradores podem adicionar outros administradores.'], 403);
+        $user = $this->userService->updateUser($id, $request->validated());
+        return response()->json(['user' => $user, 'message' => 'User updated successfully'], 200);
     }
 
-    $admin = User::create([
-        'name' => $request->name,
-        'email' => $request->email,
-        'cpf' => $request->cpf,
-        'password' => Hash::make($request->password),
-        'role' => 'admin', 
-    ]);
-
-    return response()->json(['message' => 'Administrador registrado com sucesso!']);
-    }
-
-    public function updateAdmin(Request $request, $id) 
+    public function delete(DeleteUserRequest $request, $id): JsonResponse
     {
-
-    $request->validate([
-        'name' => 'sometimes|required|string',
-        'email' => 'sometimes|required|string|email|unique:users,email,' . $id,
-        'cpf' => 'sometimes|required|string|max:11|unique:users,cpf,' . $id,
-        'password' => 'sometimes|required|string|min:8|confirmed|nullable',
-    ]);
-
-    if (auth()->check() && auth()->user()->role !== 'admin') {
-        return response()->json(['message' => 'Acesso negado. Somente administradores podem atualizar outros administradores.'], 403);
+        $user = $this->userService->deleteUser($id);
+        return response()->json(['user' => $user, 'message' => 'User deleted successfully'], 200);
     }
 
-    $admin = User::findOrFail($id);
-
-    $admin->name = $request->name ?? $admin->name;
-    $admin->email = $request->email ?? $admin->email;
-    $admin->cpf = $request->cpf ?? $admin->cpf;
-
-    if ($request->filled('password')) {
-        $admin->password = Hash::make($request->password);
-    }
-    $admin->save();
-
-    return response()->json(['message' => 'Administrador atualizado com sucesso!']);
-    }   
-
-    
-    public function update(Request $request, $id) 
+    public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
-        $user = User::findOrFail($id);
-    
-        $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|string|email|unique:users,email,' . $user->id,
-            'cpf' => 'required|string|max:11|unique:users,cpf,' . $user->id,
-            'password' => 'sometimes|required|string|min:8|confirmed',
-        ]);
-    
-        if (auth()->user()->role === 'admin') {
-            $request->validate(['role' => 'required|string|in:admin,user']);
-            $user->role = $request->role;
+        $token = $this->userService->forgotPassword($request->email);
+        if (!$token) {
+            return response()->json(['message' => 'Email not found'], 404);
         }
-    
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->cpf = $request->cpf;
-        
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
-        }
-    
-        $user->save();
-    
-        return response()->json(['message' => 'Usuário atualizado com sucesso!']);
+        return response()->json(['token' => $token, 'message' => 'Reset token created'], 200);
     }
-    
 
-    public function delete(Request $request, $id) 
+    public function resetPassword(ResetPasswordRequest $request): JsonResponse
     {
-    $user = User::findOrFail($id);
-
-    $user->delete();
-
-    return response()->json(['message' => 'Usuário deletado com sucesso!']);
+        $user = $this->userService->resetPassword($request->validated());
+        return response()->json(['user' => $user, 'message' => 'Password reset successfully'], 200);
     }
-
-
-    public function login(Request $request) 
-    {
-        $request->validate([
-            'cpf' => 'required|string|regex:/^\d{11}$/', 
-            'password' => 'required|string',
-        ]);
-    
-        $user = User::where('cpf', $request->cpf)->first();
-    
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'cpf' => ['As credenciais fornecidas estão incorretas.'],
-            ]);
-        }
-    
-        $token = $user->createToken('token-name')->plainTextToken;
-        return response()->json([
-            'token' => $token,
-            'role' => $user->role 
-        ]);
-    }
-
-    public function logout(Request $request)
-    {
-        $request->user()->currentAccessToken()->delete();
-
-        return response()->json(['message' => 'Logout realizado com sucesso!']);
-    }
-
-    public function forgotPassword(Request $request)
-    {
-        $request->validate(['email' => 'required|email']);
-
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
-
-        return $status === Password::RESET_LINK_SENT
-            ? response()->json(['message' => __($status)])
-            : response()->json(['message' => __($status)], 400);
-    }
-
-
-
-    public function reset(Request $request)
-    {
-        $request->validate([
-            'token' => 'required|string',
-            'email' => 'required|email',
-            'password' => 'required|string|confirmed',
-        ]);
-
-
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user) {
-            return response()->json(['message' => 'Usuário não encontrado.'], 404);
-        }
-
-        $user->password = Hash::make($request->password);
-        $user->save();
-
-        return response()->json(['message' => 'Senha atualizada com sucesso.']);
-    }
-
-    
-
-    public function showResetForm($token)
-    {
-        return view('auth.reset-password', ['token' => $token]);
-    }
-
 }
