@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Services\MeetingService;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Models\Meeting;
+
 
 class MeetingController extends Controller
 {
@@ -15,9 +17,31 @@ class MeetingController extends Controller
         $this->meetingService = $meetingService;
     }
 
+
+
     public function index()
     {
         return response()->json($this->meetingService->getAllMeetings());
+    }
+
+    public function getRoomOccupancy($date)
+    {
+        $occupancyData = $this->meetingService->getRoomOccupancy($date);
+
+        return response()->json([
+            'date' => $date,
+            'occupancy_by_room' => array_values($occupancyData),
+        ]);
+    }
+
+    public function getReservationsByDay($date)
+    {
+        $reservationsCount = $this->meetingService->getReservationsCount($date);
+
+        return response()->json([
+            'date' => $date,
+            'reservations_count' => $reservationsCount,
+        ]);
     }
 
     public function getMeetingsByDay($date)
@@ -67,22 +91,20 @@ class MeetingController extends Controller
             return response()->json(['error' => true, 'message' => $e->getMessage()], 400);
         }
     }
-public function updateStatus(Request $request, $id)
-{
-    $request->validate([
-        'status' => 'required|in:confirmed,canceled',
-    ]);
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:confirmed,canceled',
+        ]);
 
-    try {
-        $meeting = $this->meetingService->updateMeetingStatus($id, $request->status);
-        
-        return response()->json($meeting);
-    } catch (\Exception $e) {
-        return response()->json(['error' => true, 'message' => $e->getMessage()], 400);
+        try {
+            $meeting = $this->meetingService->updateMeetingStatus($id, $request->status);
+
+            return response()->json($meeting);
+        } catch (\Exception $e) {
+            return response()->json(['error' => true, 'message' => $e->getMessage()], 400);
+        }
     }
-}
-
-
 
     public function destroy($id)
     {
