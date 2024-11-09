@@ -48,6 +48,7 @@ class MeetingRepository
         \Log::info("Verificando conflito para Sala ID: $roomId, Início: $startTime, Fim: $endTime");
 
         $conflict = Meeting::where('room_id', $roomId)
+            ->where('status', 'confirmed') 
             ->where(function ($query) use ($startTime, $endTime) {
                 $query->where(function ($query) use ($startTime, $endTime) {
                     $query->where('start_time', '<', $endTime)
