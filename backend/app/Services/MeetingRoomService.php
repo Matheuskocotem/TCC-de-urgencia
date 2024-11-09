@@ -25,7 +25,7 @@ class MeetingRoomService
     {
         $room = $this->repository->getRoomById($id);
         if (!$room) {
-            throw new \Exception("Room not found", 404);  
+            throw new \Exception("Room not found", 404);
         }
         return $room;
     }
@@ -42,7 +42,7 @@ class MeetingRoomService
 
         $room = $this->repository->getRoomById($id);
         if (!$room) {
-            throw new \Exception("Room not found", 404);  
+            throw new \Exception("Room not found", 404);
         }
         return $this->repository->updateRoom($room, $request->all());
     }
@@ -51,7 +51,7 @@ class MeetingRoomService
     {
         $room = $this->repository->getRoomById($id);
         if (!$room) {
-            throw new \Exception("Room not found", 404);  
+            throw new \Exception("Room not found", 404);
         }
         $this->repository->deleteRoom($room);
     }
@@ -61,7 +61,7 @@ class MeetingRoomService
         $occupancies = $this->repository->getOccupancyData();
 
         if (!$occupancies) {
-            throw new \Exception("No occupancy data found", 404);  
+            throw new \Exception("No occupancy data found", 404);
         }
 
         return [
@@ -74,26 +74,22 @@ class MeetingRoomService
     {
         $validatedDate = Carbon::createFromFormat('Y-m-d', $date);
         if (!$validatedDate) {
-            throw new ValidationException("Invalid date format"); 
+            throw ValidationException::withMessages(['date' => 'Invalid date format']);
         }
-        
+    
         return $this->repository->getOccupiedHours($roomId, $validatedDate);
     }
 
-    private function validateRequest(Request $request, $isUpdate = false)
-    {
-        $rules = [
-            'nome' => $isUpdate ? 'sometimes|required|string|max:255' : 'required|string|max:255',
-            'localizacao' => $isUpdate ? 'sometimes|required|string|max:255' : 'required|string|max:255',
-            'capacidade' => $isUpdate ? 'sometimes|required|integer' : 'required|integer',
-            'recursos' => 'nullable|array',
-            'descricao' => 'nullable|string',
-        ];
-    
-        $validated = $request->validate($rules);
-    
-        if (!$validated) {
-            throw new ValidationException('Request validation failed');
-        }
-    }
+private function validateRequest(Request $request, $isUpdate = false)
+{
+    $rules = [
+        'nome' => $isUpdate ? 'sometimes|required|string|max:255' : 'required|string|max:255',
+        'localizacao' => $isUpdate ? 'sometimes|required|string|max:255' : 'required|string|max:255',
+        'capacidade' => $isUpdate ? 'sometimes|required|integer' : 'required|integer',
+        'recursos' => 'nullable|array',
+        'descricao' => 'nullable|string',
+    ];
+
+    $request->validate($rules);
+}
 }

@@ -32,6 +32,39 @@ class MeetingService
         return $this->meetingRepository->getMeetingsByDate($validatedDate);
     }
 
+    public function getRoomOccupancy($date)
+    {
+        $date = Carbon::parse($date)->format('Y-m-d');
+        
+        $occupancyByRoom = $this->meetingRepository->getRoomOccupancyByDate($date);
+
+        $occupancyData = [];
+
+        foreach ($occupancyByRoom as $meeting) {
+            $startTime = Carbon::parse($meeting->start_time);
+            $endTime = Carbon::parse($meeting->end_time);
+            $duration = $endTime->diffInHours($startTime);
+
+            if (isset($occupancyData[$meeting->room_id])) {
+                $occupancyData[$meeting->room_id]['hours'] += $duration;
+                $occupancyData[$meeting->room_id]['reservations_count'] += 1;
+            } else {
+                $occupancyData[$meeting->room_id] = [
+                    'room_id' => $meeting->room_id,
+                    'hours' => $duration,
+                    'reservations_count' => 1,
+                ];
+            }
+        }
+
+        return $occupancyData;
+    }
+
+    public function getReservationsCount($date)
+    {
+        return $this->meetingRepository->countReservationsByDate($date);
+    }
+
     public function createMeeting(array $data)
     {
         $startTime = Carbon::createFromFormat('Y-m-d H:i', $data['date'] . ' ' . $data['start_time'])->setTimezone('America/Sao_Paulo');
@@ -70,7 +103,7 @@ class MeetingService
 
         return $this->meetingRepository->updateMeeting($meeting, $data);
     }
-    
+
     public function updateMeetingStatus($id, string $status)
     {
         $meeting = $this->meetingRepository->findMeetingById($id);

@@ -17,6 +17,20 @@ class MeetingRepository
         return Meeting::whereDate('date', $date->format('Y-m-d'))->get();
     }
 
+    public function getRoomOccupancyByDate($date)
+    {
+        return Meeting::whereDate('date', $date)
+            ->where('status', 'confirmed')
+            ->get();
+    }
+
+    public function countReservationsByDate($date)
+    {
+        return Meeting::whereDate('date', $date)
+            ->where('status', 'confirmed')
+            ->count();
+    }
+
     public function createMeeting(array $data)
     {
         return Meeting::create($data);
@@ -48,6 +62,7 @@ class MeetingRepository
         \Log::info("Verificando conflito para Sala ID: $roomId, Início: $startTime, Fim: $endTime");
 
         $conflict = Meeting::where('room_id', $roomId)
+            ->where('status', 'confirmed')
             ->where(function ($query) use ($startTime, $endTime) {
                 $query->where(function ($query) use ($startTime, $endTime) {
                     $query->where('start_time', '<', $endTime)
