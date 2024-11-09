@@ -6,34 +6,39 @@ use App\Models\User;
 
 class UserRepository
 {
-    public function create(array $data)
+    public function getAllUsers()
+    {
+        return User::select('id', 'name', 'email', 'cpf', 'role', 'created_at')->get();
+    }
+
+    public function findUserById($id)
+    {
+        return User::findOrFail($id);
+    }
+
+    public function createUser($data)
     {
         return User::create($data);
     }
 
-    public function update(User $user, array $data)
+    public function updateUser(User $user, $data)
     {
         $user->update($data);
         return $user;
     }
 
-    public function delete(User $user)
+    public function deleteUser(User $user)
     {
         return $user->delete();
     }
 
-    public function findByEmail(string $email)
-    {
-        return User::where('email', $email)->first();
-    }
-
-    public function findByCpf(string $cpf)
+    public function getUserByCpf($cpf)
     {
         return User::where('cpf', $cpf)->first();
     }
 
-    public function findById(int $id)
+    public function countUsers()
     {
-        return User::find($id);
+        return User::count();
     }
 }

@@ -2,14 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\RegisterUserRequest;
-use App\Http\Requests\LoginRequest;
-use App\Http\Requests\ForgotPasswordRequest;
-use App\Http\Requests\ResetPasswordRequest;
-use App\Http\Requests\DeleteUserRequest;
-use App\Http\Requests\UpdateUserRequest;
+use Illuminate\Http\Request;
 use App\Services\UserService;
-use Illuminate\Http\JsonResponse;
 
 class AuthController extends Controller
 {
@@ -20,45 +14,88 @@ class AuthController extends Controller
         $this->userService = $userService;
     }
 
-    public function register(RegisterUserRequest $request): JsonResponse
+    public function getSummaryData()
     {
-        $user = $this->userService->registerUser($request->validated());
-        return response()->json(['user' => $user, 'message' => 'User registered successfully'], 201);
+        return response()->json($this->userService->getSummaryData());
     }
 
-    public function login(LoginRequest $request): JsonResponse
+    public function index()
     {
-        $token = $this->userService->loginUser($request->cpf, $request->password);
-        if (!$token) {
-            return response()->json(['message' => 'Invalid credentials'], 401);
+        if (auth()->user()->role !== 'admin') {
+            return response()->json(['message' => 'Acesso negado. Apenas administradores podem visualizar todos os usuários.'], 403);
         }
-        return response()->json(['token' => $token], 200);
+
+        return response()->json(['users' => $this->userService->getAllUsers()]);
     }
 
-    public function update(UpdateUserRequest $request, $id): JsonResponse
+    public function register(Request $request)
     {
-        $user = $this->userService->updateUser($id, $request->validated());
-        return response()->json(['user' => $user, 'message' => 'User updated successfully'], 200);
+        $data = $request->validate([
+            'name' => 'required|string',
+            'email' => 'required|string|email|unique:users',
+            'cpf' => 'required|string|max:11|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $data['role'] = auth()->check() && auth()->user()->role === 'admin' ? $request->input('role', 'user') : 'user';
+
+        return response()->json(['message' => 'Usuário registrado com sucesso!', 'user' => $this->userService->registerUser($data)]);
     }
 
-    public function delete(DeleteUserRequest $request, $id): JsonResponse
+    public function addAdmin(Request $request)
     {
-        $user = $this->userService->deleteUser($id);
-        return response()->json(['user' => $user, 'message' => 'User deleted successfully'], 200);
+        $data = $request->validate([
+            'name' => 'required|string',
+            'email' => 'required|string|email|unique:users',
+            'cpf' => 'required|string|max:11|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        return response()->json(['message' => 'Administrador registrado com sucesso!', 'admin' => $this->userService->addAdmin($data)]);
     }
 
-    public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
+    public function updateAdmin(Request $request, $id)
     {
-        $token = $this->userService->forgotPassword($request->email);
-        if (!$token) {
-            return response()->json(['message' => 'Email not found'], 404);
-        }
-        return response()->json(['token' => $token, 'message' => 'Reset token created'], 200);
+        $data = $request->validate([
+            'name' => 'sometimes|required|string',
+            'email' => 'sometimes|required|string|email|unique:users,email,' . $id,
+            'cpf' => 'sometimes|required|string|max:11|unique:users,cpf,' . $id,
+            'password' => 'sometimes|required|string|min:8|confirmed|nullable',
+        ]);
+
+        return response()->json(['message' => 'Administrador atualizado com sucesso!', 'admin' => $this->userService->updateAdmin($id, $data)]);
     }
 
-    public function resetPassword(ResetPasswordRequest $request): JsonResponse
+    public function update(Request $request, $id)
     {
-        $user = $this->userService->resetPassword($request->validated());
-        return response()->json(['user' => $user, 'message' => 'Password reset successfully'], 200);
+        $data = $request->validate([
+            'name' => 'required|string',
+            'email' => 'required|string|email|unique:users,email,' . $id,
+            'cpf' => 'required|string|max:11|unique:users,cpf,' . $id,
+            'password' => 'sometimes|required|string|min:8|confirmed',
+        ]);
+
+        $isAdmin = auth()->user()->role === 'admin';
+        return response()->json(['message' => 'Usuário atualizado com sucesso!', 'user' => $this->userService->updateUser($id, $data, $isAdmin)]);
+    }
+
+    public function delete(Request $request, $id)
+    {
+        return response()->json(['message' => 'Usuário deletado com sucesso!', 'user' => $this->userService->deleteUser($id)]);
+    }
+
+    public function login(Request $request)
+    {
+        $data = $request->validate([
+            'cpf' => 'required|string|regex:/^\d{11}$/',
+            'password' => 'required|string',
+        ]);
+
+        return response()->json($this->userService->loginUser($data['cpf'], $data['password']));
+    }
+
+    public function logout(Request $request)
+    {
+        return response()->json($this->userService->logoutUser($request->user()));
     }
 }

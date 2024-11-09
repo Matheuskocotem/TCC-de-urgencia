@@ -2,11 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
-use App\Models\User;
-use Illuminate\Support\Facades\Password;
+use Illuminate\Validation\ValidationException;
 
 class UserService
 {
@@ -17,56 +16,81 @@ class UserService
         $this->userRepository = $userRepository;
     }
 
-    public function registerUser(array $data)
+    public function getAllUsers()
     {
-        $data['password'] = Hash::make($data['password']);
-        return $this->userRepository->create($data);
+        return $this->userRepository->getAllUsers();
     }
 
-    public function updateUser(User $user, array $data)
+    public function registerUser($data)
     {
+        $data['password'] = Hash::make($data['password']);
+        return $this->userRepository->createUser($data);
+    }
+
+    public function addAdmin($data)
+    {
+        $data['role'] = 'admin';
+        return $this->registerUser($data);
+    }
+
+    public function updateAdmin($id, $data)
+    {
+        $user = $this->userRepository->findUserById($id);
+
         if (isset($data['password'])) {
             $data['password'] = Hash::make($data['password']);
         }
-        return $this->userRepository->update($user, $data);
+
+        return $this->userRepository->updateUser($user, $data);
     }
 
-    public function deleteUser(User $user)
+    public function updateUser($id, $data, $isAdmin = false)
     {
-        return $this->userRepository->delete($user);
+        $user = $this->userRepository->findUserById($id);
+
+        if ($isAdmin && isset($data['role'])) {
+            $user->role = $data['role'];
+        }
+
+        if (isset($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        }
+
+        return $this->userRepository->updateUser($user, $data);
     }
 
-    public function loginUser(string $cpf, string $password)
+    public function deleteUser($id)
     {
-        $user = $this->userRepository->findByCpf($cpf);
+        $user = $this->userRepository->findUserById($id);
+        return $this->userRepository->deleteUser($user);
+    }
+
+    public function loginUser($cpf, $password)
+    {
+        $user = $this->userRepository->getUserByCpf($cpf);
+
         if (!$user || !Hash::check($password, $user->password)) {
-            return null;
+            throw ValidationException::withMessages([
+                'cpf' => ['As credenciais fornecidas estão incorretas.'],
+            ]);
         }
-        return $user->createToken('auth_token')->plainTextToken;
+
+        $token = $user->createToken('token-name')->plainTextToken;
+        return ['token' => $token, 'role' => $user->role];
     }
 
-    public function forgotPassword(string $email)
+    public function logoutUser($user)
     {
-        $user = $this->userRepository->findByEmail($email);
-        if (!$user) {
-            return null;
-        }
-
-        $token = Password::createToken($user);
-        return $token;
+        $user->currentAccessToken()->delete();
+        return ['message' => 'Logout realizado com sucesso!'];
     }
 
-    public function resetPassword(array $data)
+    public function getSummaryData()
     {
-        $user = $this->userRepository->findByEmail($data['email']);
-        if (!$user) {
-            return null;
-        }
-
-        $user->password = Hash::make($data['password']);
-        $user->setRememberToken(Str::random(60));
-        $user->save();
-
-        return $user;
+        return [
+            'totalReservas' => \App\Models\Meeting::count(),
+            'salasDisponiveis' => \App\Models\MeetingRoom::count(),
+            'totalUsuarios' => $this->userRepository->countUsers(),
+        ];
     }
 }
