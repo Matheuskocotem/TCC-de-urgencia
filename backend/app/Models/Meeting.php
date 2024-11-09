@@ -31,15 +31,12 @@ class Meeting extends Model
         return $this->belongsTo(MeetingRoom::class);
     }
 
-    /**
-     * Evento que é chamado antes de salvar o modelo.
-     */
+
     protected static function boot()
     {
         parent::boot();
     
         static::saving(function ($meeting) {
-            // Só verificar conflito se o status for "confirmed"
             if ($meeting->status === 'confirmed' && $meeting->hasTimeConflict()) {
                 throw new \Exception('Conflito de horário com outra reunião confirmada.');
             }
