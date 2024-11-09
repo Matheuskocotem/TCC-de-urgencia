@@ -15,6 +15,8 @@ class Meeting extends Model
         'user_id',
         'title',
         'description',
+        'date',
+        'status',
         'start_time',
         'end_time',
     ];

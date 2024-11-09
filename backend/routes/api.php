@@ -35,6 +35,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/{id}', [MeetingController::class, 'show']); 
         Route::put('/{id}', [MeetingController::class, 'update']); 
         Route::delete('/{id}', [MeetingController::class, 'destroy']); 
+        Route::put('/{id}/status', [MeetingController::class, 'updateStatus']);
     });
 
     Route::middleware(['role:admin'])->prefix('users')->group(function () {
