@@ -34,7 +34,6 @@ class MeetingRoomService
     {
         $this->validateRequest($request);
 
-        // Adicionando disponibilidade padrão, caso não seja fornecida no request
         $availability = $request->input('disponibilidade', [
             ['inicio' => '08:00', 'fim' => '09:00'],
             ['inicio' => '09:00', 'fim' => '10:00'],

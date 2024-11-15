@@ -55,8 +55,10 @@ class MeetingRoomController extends Controller
     {
         // Validação da disponibilidade como um array
         $validated = $request->validate([
-            'disponibilidade' => 'required|array', 
-            'disponibilidade.*' => 'string', 
+            'disponibilidade' => 'required|array',
+            'disponibilidade.*' => 'required|array',
+            'disponibilidade.*.inicio' => 'required|date_format:H:i',
+            'disponibilidade.*.fim' => 'required|date_format:H:i',
         ]);
 
         // Atualiza a disponibilidade da sala
