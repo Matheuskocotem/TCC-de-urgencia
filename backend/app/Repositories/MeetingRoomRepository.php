@@ -57,4 +57,13 @@ class MeetingRoomRepository
 
         return $occupancies;
     }
+
+    public function updateAvailability($roomId, $availability)
+    {
+        $room = $this->getRoomById($roomId);
+        $room->disponibilidade = $availability;
+        $room->save();
+
+        return $room;
+    }
 }

@@ -18,9 +18,11 @@ return new class extends Migration {
             $table->json('recursos')->nullable();
             $table->boolean('ativo')->default(true);
             $table->text('descricao')->nullable();
+            $table->json('disponibilidade');  // Remover o valor default aqui
             $table->timestamps();
         });
     }
+    
 
     /**
      * Reverse the migrations.

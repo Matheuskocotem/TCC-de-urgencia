@@ -33,6 +33,39 @@ class MeetingRoomController extends Controller
         return response()->json($occupiedHours);
     }
 
+    public function checkAvailability(Request $request, $roomId)
+    {
+        $validated = $request->validate([
+            'date' => 'required|date_format:Y-m-d',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i',
+        ]);
+
+        $isAvailable = $this->service->checkAvailability(
+            $roomId,
+            $validated['date'],
+            $validated['start_time'],
+            $validated['end_time']
+        );
+
+        return response()->json(['available' => $isAvailable], Response::HTTP_OK);
+    }
+
+    public function updateAvailability(Request $request, $roomId)
+    {
+        // Validação da disponibilidade como um array
+        $validated = $request->validate([
+            'disponibilidade' => 'required|array',
+            'disponibilidade.*' => 'required|array',
+            'disponibilidade.*.inicio' => 'required|date_format:H:i',
+            'disponibilidade.*.fim' => 'required|date_format:H:i',
+        ]);
+
+        // Atualiza a disponibilidade da sala
+        $updatedRoom = $this->service->updateAvailability($roomId, $validated['disponibilidade']);
+        return response()->json($updatedRoom, Response::HTTP_OK);
+    }
+
     public function store(Request $request)
     {
         try {
@@ -47,7 +80,6 @@ class MeetingRoomController extends Controller
             return response()->json(['message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    
 
     public function show($id)
     {
