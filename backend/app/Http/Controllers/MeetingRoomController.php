@@ -33,6 +33,34 @@ class MeetingRoomController extends Controller
         return response()->json($occupiedHours);
     }
 
+    public function checkAvailability(Request $request, $roomId)
+    {
+        $validated = $request->validate([
+            'date' => 'required|date_format:Y-m-d',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i',
+        ]);
+
+        $isAvailable = $this->service->checkAvailability(
+            $roomId,
+            $validated['date'],
+            $validated['start_time'],
+            $validated['end_time']
+        );
+
+        return response()->json(['available' => $isAvailable]);
+    }
+
+    public function updateAvailability(Request $request, $roomId)
+    {
+        $validated = $request->validate([
+            'disponibilidade' => 'required|array',
+        ]);
+
+        $updatedRoom = $this->service->updateAvailability($roomId, $validated['disponibilidade']);
+        return response()->json($updatedRoom);
+    }
+
     public function store(Request $request)
     {
         try {
@@ -47,7 +75,6 @@ class MeetingRoomController extends Controller
             return response()->json(['message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    
 
     public function show($id)
     {

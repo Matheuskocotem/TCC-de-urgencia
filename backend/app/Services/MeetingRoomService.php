@@ -80,16 +80,53 @@ class MeetingRoomService
         return $this->repository->getOccupiedHours($roomId, $validatedDate);
     }
 
-private function validateRequest(Request $request, $isUpdate = false)
-{
-    $rules = [
-        'nome' => $isUpdate ? 'sometimes|required|string|max:255' : 'required|string|max:255',
-        'localizacao' => $isUpdate ? 'sometimes|required|string|max:255' : 'required|string|max:255',
-        'capacidade' => $isUpdate ? 'sometimes|required|integer' : 'required|integer',
-        'recursos' => 'nullable|array',
-        'descricao' => 'nullable|string',
-    ];
+    public function checkAvailability($roomId, $date, $startTime, $endTime)
+    {
+        try {
+            $validatedDate = Carbon::createFromFormat('Y-m-d', $date);
+            $validatedStartTime = Carbon::createFromFormat('H:i', $startTime);
+            $validatedEndTime = Carbon::createFromFormat('H:i', $endTime);
+        } catch (\Exception $e) {
+            throw ValidationException::withMessages([
+                'date' => 'Invalid date or time format.',
+            ]);
+        }
 
-    $request->validate($rules);
-}
+        if ($validatedStartTime->greaterThanOrEqualTo($validatedEndTime)) {
+            throw new \Exception('Start time must be earlier than end time.');
+        }
+
+        $occupiedHours = $this->repository->getOccupiedHours($roomId, $validatedDate);
+
+        foreach ($occupiedHours as $hour) {
+            $start = Carbon::parse($hour->start_time);
+            $end = Carbon::parse($hour->end_time);
+
+            if ($validatedStartTime->between($start, $end) || $validatedEndTime->between($start, $end)) {
+                return false; // Conflito de horários
+            }
+        }
+
+        return true; 
+    }
+    public function updateAvailability($roomId, $availability)
+    {
+        return $this->repository->updateAvailability($roomId, $availability);
+    }
+
+    private function validateRequest(Request $request, $isUpdate = false)
+    {
+        $rules = $this->getValidationRules($isUpdate);
+        $request->validate($rules);
+    }
+    private function getValidationRules($isUpdate)
+    {
+        return [
+            'nome' => $isUpdate ? 'sometimes|required|string|max:255' : 'required|string|max:255',
+            'localizacao' => $isUpdate ? 'sometimes|required|string|max:255' : 'required|string|max:255',
+            'capacidade' => $isUpdate ? 'sometimes|required|integer' : 'required|integer',
+            'recursos' => 'nullable|array',
+            'descricao' => 'nullable|string',
+        ];
+    }
 }
