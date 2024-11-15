@@ -18,7 +18,6 @@ class MeetingRoom extends Model
         'recursos',
         'ativo',
         'disponibilidade',
-        'imagem',
         'descricao',
     ];
 

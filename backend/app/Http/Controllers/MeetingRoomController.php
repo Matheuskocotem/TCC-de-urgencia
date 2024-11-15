@@ -48,17 +48,20 @@ class MeetingRoomController extends Controller
             $validated['end_time']
         );
 
-        return response()->json(['available' => $isAvailable]);
+        return response()->json(['available' => $isAvailable], Response::HTTP_OK);
     }
 
     public function updateAvailability(Request $request, $roomId)
     {
+        // Validação da disponibilidade como um array
         $validated = $request->validate([
-            'disponibilidade' => 'required|array',
+            'disponibilidade' => 'required|array', 
+            'disponibilidade.*' => 'string', 
         ]);
 
+        // Atualiza a disponibilidade da sala
         $updatedRoom = $this->service->updateAvailability($roomId, $validated['disponibilidade']);
-        return response()->json($updatedRoom);
+        return response()->json($updatedRoom, Response::HTTP_OK);
     }
 
     public function store(Request $request)

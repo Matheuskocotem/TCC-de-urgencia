@@ -33,6 +33,21 @@ class MeetingRoomService
     public function createRoom(Request $request)
     {
         $this->validateRequest($request);
+
+        // Adicionando disponibilidade padrão, caso não seja fornecida no request
+        $availability = $request->input('disponibilidade', [
+            ['inicio' => '08:00', 'fim' => '09:00'],
+            ['inicio' => '09:00', 'fim' => '10:00'],
+            ['inicio' => '10:00', 'fim' => '11:00'],
+            ['inicio' => '11:00', 'fim' => '12:00'],
+            ['inicio' => '13:00', 'fim' => '14:00'],
+            ['inicio' => '14:00', 'fim' => '15:00'],
+            ['inicio' => '15:00', 'fim' => '16:00'],
+            ['inicio' => '16:00', 'fim' => '17:00']
+        ]);
+
+        $request->merge(['disponibilidade' => $availability]);
+
         return $this->repository->createRoom($request->all());
     }
 
@@ -44,6 +59,10 @@ class MeetingRoomService
         if (!$room) {
             throw new \Exception("Room not found", 404);
         }
+
+        $availability = $request->input('disponibilidade', $room->disponibilidade);
+        $request->merge(['disponibilidade' => $availability]);
+
         return $this->repository->updateRoom($room, $request->all());
     }
 
@@ -76,7 +95,7 @@ class MeetingRoomService
         if (!$validatedDate) {
             throw ValidationException::withMessages(['date' => 'Invalid date format']);
         }
-    
+
         return $this->repository->getOccupiedHours($roomId, $validatedDate);
     }
 
@@ -103,12 +122,13 @@ class MeetingRoomService
             $end = Carbon::parse($hour->end_time);
 
             if ($validatedStartTime->between($start, $end) || $validatedEndTime->between($start, $end)) {
-                return false; // Conflito de horários
+                return false;
             }
         }
 
-        return true; 
+        return true;
     }
+
     public function updateAvailability($roomId, $availability)
     {
         return $this->repository->updateAvailability($roomId, $availability);
@@ -119,6 +139,7 @@ class MeetingRoomService
         $rules = $this->getValidationRules($isUpdate);
         $request->validate($rules);
     }
+
     private function getValidationRules($isUpdate)
     {
         return [
@@ -127,6 +148,7 @@ class MeetingRoomService
             'capacidade' => $isUpdate ? 'sometimes|required|integer' : 'required|integer',
             'recursos' => 'nullable|array',
             'descricao' => 'nullable|string',
+            'disponibilidade' => 'nullable|array', 
         ];
     }
 }
